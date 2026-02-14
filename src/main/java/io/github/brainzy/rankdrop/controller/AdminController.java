@@ -23,10 +23,7 @@ public class AdminController {
 
     @PostMapping
     public ResponseEntity<Leaderboard> create(@Valid @RequestBody LeaderboardCreateRequest request) {
-        Leaderboard saved = leaderboardService.createNewLeaderboard(
-                request.slug(),
-                request.displayName()
-        );
+        Leaderboard saved = leaderboardService.createNewLeaderboard(request);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 

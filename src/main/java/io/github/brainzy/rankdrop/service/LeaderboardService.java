@@ -1,5 +1,6 @@
 package io.github.brainzy.rankdrop.service;
 
+import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.exception.LeaderboardAlreadyExistsException;
 import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
@@ -18,14 +19,17 @@ public class LeaderboardService {
         this.leaderboardRepository = leaderboardRepository;
     }
 
-    public Leaderboard createNewLeaderboard(String slug, String displayName) {
-        if (leaderboardRepository.findBySlug(slug).isPresent()) {
-            throw new LeaderboardAlreadyExistsException(slug);
+    public Leaderboard createNewLeaderboard(LeaderboardCreateRequest request) {
+        if (leaderboardRepository.findBySlug(request.slug()).isPresent()) {
+            throw new LeaderboardAlreadyExistsException(request.slug());
         }
-        Leaderboard b = new Leaderboard();
-        b.setSlug(slug);
-        b.setDisplayName(displayName != null ? displayName : slug);
-        return leaderboardRepository.save(b);
+
+        Leaderboard lb = Leaderboard.builder()
+                .slug(request.slug())
+                .displayName(request.displayName())
+                .sortOrder(request.sortOrder())
+                .build();
+        return leaderboardRepository.save(lb);
     }
 
     public Leaderboard updateExistingLeaderboard(String slug, String displayName) {

@@ -26,4 +26,9 @@ public class Leaderboard {
     @JsonManagedReference
     @OneToMany(mappedBy = "leaderboard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScoreEntry> entries;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "sort_order", nullable = false)
+    private SortOrder sortOrder = SortOrder.DESC;
 }
