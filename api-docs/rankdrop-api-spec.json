@@ -1,0 +1,259 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "RankDrop API",
+    "description": "High-performance gaming leaderboard system with Admin management and Public score submission.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local Development Server"
+    }
+  ],
+  "paths": {
+    "/api/v1/admin/leaderboards/{slug}": {
+      "put": {
+        "summary": "Update leaderboard display name",
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "{{admin_secret}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "displayName": {
+                    "type": "string",
+                    "example": "Season 2 Gold League"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully"
+          },
+          "404": {
+            "description": "Leaderboard not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a leaderboard",
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "{{admin_secret}}"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Leaderboard deleted successfully"
+          },
+          "404": {
+            "description": "Leaderboard not found"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/leaderboards": {
+      "get": {
+        "summary": "List all leaderboards (Admin)",
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new leaderboard",
+        "security": [
+          {
+            "AdminAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "{{admin_secret}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "slug": {
+                    "type": "string",
+                    "example": "gold-league"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "example": "Gold League"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Leaderboard created successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/v1/leaderboards/{slug}": {
+      "get": {
+        "summary": "Get leaderboard and top scores",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation"
+          },
+          "404": {
+            "description": "Leaderboard not found"
+          }
+        }
+      }
+    },
+    "/api/v1/leaderboards/{slug}/scores": {
+      "post": {
+        "summary": "Submit a player score",
+        "security": [
+          {
+            "GameAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Game-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "{{game_secret}}"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "playerName": {
+                    "type": "string",
+                    "example": "Alice"
+                  },
+                  "score": {
+                    "type": "number",
+                    "example": 9500.5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Score submitted"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AdminAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Admin-Token"
+      },
+      "GameAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Game-Key"
+      }
+    }
+  }
+}
