@@ -6,6 +6,7 @@ import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/leaderboards")
+@Tag(name = "Client API", description = "Public client API")
 @Validated
 @RequiredArgsConstructor
 public class LeaderboardController {

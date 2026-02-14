@@ -4,6 +4,9 @@ import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/leaderboards")
+@Tag(name = "Admin Leaderboard Management", description = "Privileged operations for managing leaderboard configurations")
 public class AdminController {
 
     private final LeaderboardService leaderboardService;
@@ -22,12 +26,16 @@ public class AdminController {
     }
 
     @PostMapping
+    @Operation(summary = "Create a new leaderboard", description = "Initializes a leaderboard with a unique slug and sorting rules.")
+    @ApiResponse(responseCode = "201", description = "Leaderboard created successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid input or slug already exists")
     public ResponseEntity<Leaderboard> create(@Valid @RequestBody LeaderboardCreateRequest request) {
         Leaderboard saved = leaderboardService.createNewLeaderboard(request);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @PutMapping("/{slug}")
+    @Operation(summary = "Update leaderboard settings", description = "Allows changing the display name of an existing leaderboard.")
     public ResponseEntity<Leaderboard> update(@PathVariable String slug, @Valid @RequestBody LeaderboardUpdateRequest request) {
         return ResponseEntity.ok(
                 leaderboardService.updateExistingLeaderboard(slug, request.displayName())
@@ -35,12 +43,15 @@ public class AdminController {
     }
 
     @DeleteMapping("/{slug}")
+    @Operation(summary = "Delete a leaderboard", description = "Permanently removes a leaderboard and all its associated scores.")
+    @ApiResponse(responseCode = "204", description = "Leaderboard deleted successfully")
     public ResponseEntity<Void> delete(@PathVariable String slug) {
         leaderboardService.deleteLeaderboardBySlug(slug);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
+    @Operation(summary = "List all leaderboards", description = "Returns a complete list of all active leaderboard configurations.")
     public List<Leaderboard> list() {
         return leaderboardService.getAllLeaderboards();
     }

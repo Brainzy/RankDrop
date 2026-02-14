@@ -17,7 +17,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("RankDrop API")
                         .version("1.0.0")
-                        .description("High-performance gaming leaderboard API"))
+                        .description("Built for indie teams who want to own their data and scale without the stress of recurring costs or complex setup."))
                 .addSecurityItem(new SecurityRequirement()
                         .addList("AdminAuth")
                         .addList("GameAuth"))
