@@ -1,6 +1,7 @@
 # 🏆 RankDrop
 
 **The self-hosted, Docker-optimized leaderboard service for indie games.**
+> **Built for indie teams who want to own their data and scale without the stress of recurring costs or complex setup.**
 
 ## ✨ Why RankDrop?
 
@@ -17,6 +18,8 @@
 * **Docs:** OpenAPI 3 / Swagger UI
 * **Containerization:** Docker & Docker Compose
 
+## Full API spec available: [rankdrop-api-spec.json](api-docs/rankdrop-api-spec.json)
+
 ## 🗺️ Roadmap
 
 Development is currently underway! For a full list of implemented and planned features, please
@@ -27,13 +30,21 @@ check [FEATURES.md](FEATURES.md).
 ### Run Locally (Development)
 
 ```bash
-# Clone and run
-git clone https://github.com/Brainzy/rankdrop.git
+# 1. Clone the repository
+git clone [https://github.com/Brainzy/rankdrop.git](https://github.com/Brainzy/rankdrop.git)
+
+# 2. Enter the directory
 cd rankdrop
+
+# 3. Run using the Maven wrapper
 ./mvnw spring-boot:run
 
-# Access Swagger UI
-open http://localhost:8080/swagger-ui/index.html
+Access Swagger UI, once the service is running, open your browser to:
+
+👉 http://localhost:8080/swagger-ui/index.html
+
+Use this interface to interactively create leaderboards, submit scores, and test functionality without writing a single line of client code.
+
 ```
 
 ## 📄 License
