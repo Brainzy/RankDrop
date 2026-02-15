@@ -13,7 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +50,30 @@ public class ScoreService {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(direction, "scoreValue"));
 
         return scoreRepository.findByLeaderboard_Slug(slug, pageable).getContent();
+    }
+
+    public List<ScoreEntry> getPlayerScoreWithSurrounding(String slug, String playerAlias, int surrounding) {
+        Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+
+        Sort.Direction bestSort = (leaderboard.getSortOrder() == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        ScoreEntry bestEntry = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(slug, playerAlias, Sort.by(bestSort, "scoreValue"))
+                .orElseThrow(() -> new RuntimeException("Player not found: " + playerAlias));
+
+        if (surrounding <= 0) {
+            return Collections.singletonList(bestEntry);
+        }
+
+        Pageable limitHigher = PageRequest.of(0, surrounding + 1, Sort.by(Sort.Direction.ASC, "scoreValue"));
+        Pageable limitLower = PageRequest.of(0, surrounding, Sort.by(Sort.Direction.DESC, "scoreValue"));
+        List<ScoreEntry> higherScores = scoreRepository.findByLeaderboard_SlugAndScoreValueGreaterThanEqual(slug, bestEntry.getScoreValue(), limitHigher).getContent();
+        List<ScoreEntry> lowerScores = scoreRepository.findByLeaderboard_SlugAndScoreValueLessThan(slug, bestEntry.getScoreValue(), limitLower).getContent();
+
+        return Stream.concat(higherScores.stream(), lowerScores.stream())
+                .sorted((e1, e2) -> (leaderboard.getSortOrder() == SortOrder.ASC)
+                        ? Double.compare(e1.getScoreValue(), e2.getScoreValue())
+                        : Double.compare(e2.getScoreValue(), e1.getScoreValue()))
+                .collect(Collectors.toList());
     }
 }

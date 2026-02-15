@@ -33,7 +33,7 @@ public class LeaderboardController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     public List<ScoreEntry> getTopScores(
-            @Parameter(description = "The unique slug of the leaderboard", example = "level-1")
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
             @Parameter(
@@ -59,5 +59,29 @@ public class LeaderboardController {
             @PathVariable String slug,
             @Valid @RequestBody ScoreSubmissionRequest request) {
         return scoreService.submitScore(slug, request.name(), request.score());
+    }
+
+    @GetMapping("/{slug}/players/{playerAlias}")
+    @Operation(
+            summary = "Get player rank and surrounding scores",
+            description = "Fetch a specific player's score and rank, optionally including surrounding players."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved player score")
+    @ApiResponse(responseCode = "404", description = "Leaderboard or player not found", content = @Content(schema = @Schema(hidden = true)))
+    public List<ScoreEntry> getPlayerScore(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug,
+
+            @Parameter(description = "The player's alias/username", example = "PlayerOne")
+            @PathVariable String playerAlias,
+
+            @Parameter(
+                    description = "Number of ranks above and below to fetch (e.g., 5 means ±5 ranks)",
+                    example = "5",
+                    schema = @Schema(defaultValue = "0")
+            )
+            @RequestParam(defaultValue = "0") int surrounding
+    ) {
+        return scoreService.getPlayerScoreWithSurrounding(slug, playerAlias, surrounding);
     }
 }
