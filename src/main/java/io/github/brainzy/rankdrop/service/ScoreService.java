@@ -3,6 +3,7 @@ package io.github.brainzy.rankdrop.service;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.github.brainzy.rankdrop.entity.SortOrder;
+import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreEntryRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class ScoreService {
     @Transactional
     public ScoreEntry submitScore(String slug, String playerName, double value) {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Leaderboard not found: " + slug));
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
         ScoreEntry entry = ScoreEntry.builder()
                 .playerAlias(playerName)
@@ -37,7 +38,7 @@ public class ScoreService {
 
     public List<ScoreEntry> getTopScores(String slug, int limit) {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
-                .orElseThrow(() -> new RuntimeException("Leaderboard not found"));
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
         Sort.Direction direction = (leaderboard.getSortOrder() == SortOrder.ASC)
                 ? Sort.Direction.ASC

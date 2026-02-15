@@ -25,7 +25,7 @@ public record LeaderboardCreateRequest(
                 maxLength = 50
         )
         @NotBlank(message = "Display name is required")
-        @Size(min = 1, max = 50, message = "Display name must be between 3 and 50 characters")
+        @Size(min = 1, max = 50, message = "Display name must be between 1 and 50 characters")
         String displayName,
 
         @Schema(

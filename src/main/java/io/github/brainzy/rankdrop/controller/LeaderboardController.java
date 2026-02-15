@@ -5,7 +5,9 @@ import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,8 @@ public class LeaderboardController {
             summary = "Get top scores",
             description = "Fetch the leaderboard rankings sorted according to the leaderboard configuration."
     )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores")
+    @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     public List<ScoreEntry> getTopScores(
             @Parameter(description = "The unique slug of the leaderboard", example = "level-1")
             @PathVariable String slug,
@@ -47,6 +51,9 @@ public class LeaderboardController {
             summary = "Submit a score",
             description = "Submit a new score for a player. The score will be validated against the leaderboard's min/max constraints."
     )
+    @ApiResponse(responseCode = "200", description = "Score submitted successfully")
+    @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
+    @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
     public ScoreEntry submitScore(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,

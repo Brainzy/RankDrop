@@ -3,6 +3,7 @@ package io.github.brainzy.rankdrop.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+@Schema(description = "Request object for submitting a new score")
 public record ScoreSubmissionRequest(
         @Schema(description = "The display name of the player",
                 example = "SpeedRunner99",
