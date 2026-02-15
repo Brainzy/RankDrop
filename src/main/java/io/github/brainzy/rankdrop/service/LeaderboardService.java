@@ -28,6 +28,7 @@ public class LeaderboardService {
                 .slug(request.slug())
                 .displayName(request.displayName())
                 .sortOrder(request.sortOrder())
+                .allowMultipleScores(request.allowMultipleScores())
                 .build();
         return leaderboardRepository.save(lb);
     }

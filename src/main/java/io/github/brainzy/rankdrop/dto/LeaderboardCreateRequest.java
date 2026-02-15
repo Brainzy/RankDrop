@@ -35,10 +35,18 @@ public record LeaderboardCreateRequest(
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED,
                 allowableValues = {"ASC", "DESC"}
         )
-        SortOrder sortOrder
+        SortOrder sortOrder,
+
+        @Schema(
+                description = "If true, a player can have multiple entries. If false (default), only their best score is kept.",
+                example = "false",
+                defaultValue = "false",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        Boolean allowMultipleScores
 ) {
-    // Compact constructor to ensure the record is never null internally
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
+        allowMultipleScores = (allowMultipleScores != null) && allowMultipleScores;
     }
 }

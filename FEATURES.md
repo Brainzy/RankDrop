@@ -38,7 +38,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Descending sort (high score wins)
 - [✅] Ascending sort (speedrun/lowest time wins)
 - [ ] Cumulative mode (sum all player scores)
-- [ ] One max score per player or multiple entries allowed
+- [✅] One max score per player or multiple entries allowed
 - [ ] Optional JSON/String metadata per score.
 
 ## Admin Operations

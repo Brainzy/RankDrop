@@ -38,4 +38,9 @@ public class Leaderboard {
     @Column(name = "sort_order", nullable = false)
     @Schema(description = "Sorting order for the leaderboard", example = "DESC")
     private SortOrder sortOrder = SortOrder.DESC;
+
+    @Builder.Default
+    @Column(name = "allow_multiple_scores", nullable = false)
+    @Schema(description = "If true, a player can have multiple entries. If false, only their best score is kept.", example = "false")
+    private boolean allowMultipleScores = false;
 }
