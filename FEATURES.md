@@ -15,8 +15,8 @@ Current status of all features. ✅ = Implemented
 ### Leaderboard Queries
 
 - [✅] Fetch top N players (configurable limit: 1-100)
-- [ ] Get player's current rank
-- [ ] Get surrounding players (±5 ranks for context)
+- [✅] Get player's current rank
+- [✅] Get surrounding players (±5 ranks for context)
 
 ### Performance Optimizations
 
