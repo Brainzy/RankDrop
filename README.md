@@ -1,14 +1,13 @@
 # 🏆 RankDrop
 
-**The self-hosted, Docker-optimized leaderboard service for indie games.**
-> **Built for indie teams who want to own their data and scale without the stress of recurring costs or complex setup.**
+**Self hosted Docker-optimized leaderboard service.**
+> **Own your database without running costs**
 
 ## ✨ Why RankDrop?
 
-* **Zero Recurring Cost:** Run it on a free Oracle cloud instance. No per-player or per-request pricing.
-* **Embedded & Scalable:** Starts with a zero-config H2 database; migrates seamlessly to PostgreSQL when your game goes
-  viral.
-* **Indie Optimized:** Native support for both high-score (points) and low-score (speedrun) leaderboards.
+* **Zero Recurring Cost:** Run it on a free Oracle cloud instance. No pricing per user or similar.
+* **Embedded & Scalable:** Starts with a zero-config H2 database; migrates seamlessly to PostgreSQL when needed.
+* **Supports multiple leaderboards, best score being lowest or highest, optional cumulative scores, one or multiple entry per user.
 * **Developer Experience:** Fully documented with Swagger UI. Test your endpoints directly from the browser.
 
 ## 🛠️ Tech Stack
@@ -52,4 +51,4 @@ Use this interface to interactively create leaderboards, submit scores, and test
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-Built with ❤️ for the Indie Game Community by [Brainzy](https://github.com/Brainzy)
+Built [Brainzy](https://github.com/Brainzy)
