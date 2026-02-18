@@ -1,22 +1,30 @@
 package io.github.brainzy.rankdrop.service;
 
 import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
+import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
+import io.github.brainzy.rankdrop.entity.ScoreArchive;
+import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.github.brainzy.rankdrop.exception.LeaderboardAlreadyExistsException;
 import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
+import io.github.brainzy.rankdrop.repository.ScoreArchiveRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class LeaderboardService {
     private final LeaderboardRepository leaderboardRepository;
+    private final ScoreArchiveRepository scoreArchiveRepository;
 
-    public LeaderboardService(LeaderboardRepository leaderboardRepository) {
+    public LeaderboardService(LeaderboardRepository leaderboardRepository, ScoreArchiveRepository scoreArchiveRepository) {
         this.leaderboardRepository = leaderboardRepository;
+        this.scoreArchiveRepository = scoreArchiveRepository;
     }
 
     public Leaderboard createNewLeaderboard(LeaderboardCreateRequest request) {
@@ -52,5 +60,39 @@ public class LeaderboardService {
 
     public List<Leaderboard> getAllLeaderboards() {
         return leaderboardRepository.findAll();
+    }
+
+    public void resetLeaderboard(String slug, LeaderboardResetRequest request) {
+        Leaderboard board = leaderboardRepository.findBySlug(slug)
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+
+        if (request.archiveScores()) {
+            if (request.resetLabel() == null || request.resetLabel().isBlank()) {
+                throw new IllegalArgumentException("resetLabel is required when archiveScores is true");
+            }
+            archiveScores(board, request.resetLabel());
+        }
+
+        // Clear entries
+        board.getEntries().clear();
+        leaderboardRepository.save(board);
+    }
+
+    private void archiveScores(Leaderboard board, String resetLabel) {
+        List<ScoreArchive> archives = board.getEntries().stream()
+                .map(entry -> mapToArchive(entry, resetLabel))
+                .collect(Collectors.toList());
+        scoreArchiveRepository.saveAll(archives);
+    }
+
+    private ScoreArchive mapToArchive(ScoreEntry entry, String resetLabel) {
+        return ScoreArchive.builder()
+                .leaderboardSlug(entry.getLeaderboard().getSlug())
+                .playerAlias(entry.getPlayerAlias())
+                .scoreValue(entry.getScoreValue())
+                .submittedAt(entry.getSubmittedAt())
+                .archivedAt(LocalDateTime.now())
+                .resetLabel(resetLabel)
+                .build();
     }
 }

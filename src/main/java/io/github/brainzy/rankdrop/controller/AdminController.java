@@ -1,6 +1,7 @@
 package io.github.brainzy.rankdrop.controller;
 
 import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
+import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
@@ -62,5 +63,15 @@ public class AdminController {
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of leaderboards")
     public List<Leaderboard> list() {
         return leaderboardService.getAllLeaderboards();
+    }
+
+    @PostMapping("/{slug}/reset")
+    @Operation(summary = "Reset a leaderboard", description = "Clears all scores from a leaderboard, optionally archiving them first.")
+    @ApiResponse(responseCode = "204", description = "Leaderboard reset successfully")
+    @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
+    @ApiResponse(responseCode = "400", description = "Invalid input (e.g. missing resetLabel when archiving)", content = @Content(schema = @Schema(hidden = true)))
+    public ResponseEntity<Void> reset(@PathVariable String slug, @Valid @RequestBody LeaderboardResetRequest request) {
+        leaderboardService.resetLeaderboard(slug, request);
+        return ResponseEntity.noContent().build();
     }
 }
