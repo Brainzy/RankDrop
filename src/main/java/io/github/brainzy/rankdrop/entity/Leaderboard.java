@@ -49,9 +49,11 @@ public class Leaderboard {
     @Schema(description = "If true, new scores are added to the player's existing total. If false, only the best score is kept.", example = "false")
     private boolean isCumulative = false;
 
+    @Builder.Default
     @Schema(description = "Optional minimum score value allowed for submission, default is 0.", example = "0")
-    private Double minScore;
+    private Double minScore = 0.0;
 
-    @Schema(description = "Optional maximum score value allowed for submission, default is 1000000", example = "1000000")
-    private Double maxScore;
+    @Builder.Default
+    @Schema(description = "Optional maximum score value allowed for submission, default is 1000000.", example = "1000000")
+    private Double maxScore = 1000000.0;
 }

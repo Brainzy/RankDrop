@@ -53,15 +53,17 @@ public record LeaderboardCreateRequest(
         )
         Boolean isCumulative,
 
-        @Schema(description = "Optional minimum score value allowed for submission", example = "0")
+        @Schema(description = "Optional minimum score value allowed for submission", example = "0", defaultValue = "0")
         Double minScore,
 
-        @Schema(description = "Optional maximum score value allowed for submission", example = "1000000")
+        @Schema(description = "Optional maximum score value allowed for submission", example = "1000000", defaultValue = "1000000")
         Double maxScore
 ) {
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
         allowMultipleScores = (allowMultipleScores != null) && allowMultipleScores;
         isCumulative = (isCumulative != null) && isCumulative;
+        minScore = (minScore == null) ? 0.0 : minScore;
+        maxScore = (maxScore == null) ? 1000000.0 : maxScore;
     }
 }
