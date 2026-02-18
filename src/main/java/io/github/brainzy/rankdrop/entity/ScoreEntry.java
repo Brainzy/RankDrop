@@ -10,7 +10,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "score_entries")
+@Table(name = "score_entries", indexes = {
+        @Index(name = "idx_leaderboard_score",
+                columnList = "leaderboard_id, scoreValue DESC, submittedAt ASC"),
+        @Index(name = "idx_leaderboard_player",
+                columnList = "leaderboard_id, playerAlias")
+})
 @Getter
 @Setter
 @Builder

@@ -1,7 +1,8 @@
 package io.github.brainzy.rankdrop.controller;
 
+import io.github.brainzy.rankdrop.dto.ScoreEntryResponse;
 import io.github.brainzy.rankdrop.dto.ScoreSubmissionRequest;
-import io.github.brainzy.rankdrop.entity.ScoreEntry;
+import io.github.brainzy.rankdrop.dto.ScoreSubmitResponse;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ public class LeaderboardController {
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntry> getTopScores(
+    public List<ScoreEntryResponse> getTopScores(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
@@ -54,11 +55,11 @@ public class LeaderboardController {
     @ApiResponse(responseCode = "200", description = "Score submitted successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
-    public ScoreEntry submitScore(
+    public ScoreSubmitResponse submitScore(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
             @Valid @RequestBody ScoreSubmissionRequest request) {
-        return scoreService.submitScore(slug, request.name(), request.score());
+        return scoreService.submitScore(slug, request.playerAlias(), request.scoreValue());
     }
 
     @GetMapping("/{slug}/players/{playerAlias}")
@@ -68,7 +69,7 @@ public class LeaderboardController {
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved player score")
     @ApiResponse(responseCode = "404", description = "Leaderboard or player not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntry> getPlayerScore(
+    public List<ScoreEntryResponse> getPlayerScore(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 

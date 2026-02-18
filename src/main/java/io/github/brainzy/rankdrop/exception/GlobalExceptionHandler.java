@@ -15,7 +15,6 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Handle existing slug (409 Conflict)
     @ExceptionHandler(LeaderboardAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ResponseEntity<Map<String, String>> handleLeaderboardExists(LeaderboardAlreadyExistsException ex) {
@@ -24,7 +23,6 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
-    // 2. Handle missing slug (404 Not Found) - useful for Update/Delete
     @ExceptionHandler(LeaderboardNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Map<String, String>> handleNotFound(LeaderboardNotFoundException ex) {
@@ -33,7 +31,14 @@ public class GlobalExceptionHandler {
                 .body(Map.of("error", ex.getMessage()));
     }
 
-    // 3. Your existing Validation logic (400 Bad Request)
+    @ExceptionHandler(PlayerNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, String>> handlePlayerNotFound(PlayerNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Map<String, String>> handleValidationErrors(ConstraintViolationException ex) {
