@@ -29,6 +29,7 @@ public class LeaderboardService {
                 .displayName(request.displayName())
                 .sortOrder(request.sortOrder())
                 .allowMultipleScores(request.allowMultipleScores())
+                .isCumulative(request.isCumulative())
                 .build();
         return leaderboardRepository.save(lb);
     }

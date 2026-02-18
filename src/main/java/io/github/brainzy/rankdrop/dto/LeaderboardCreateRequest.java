@@ -43,10 +43,19 @@ public record LeaderboardCreateRequest(
                 defaultValue = "false",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED
         )
-        Boolean allowMultipleScores
+        Boolean allowMultipleScores,
+
+        @Schema(
+                description = "If true, new scores are added to the player's existing total. If false (default), only the best score is kept.",
+                example = "false",
+                defaultValue = "false",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        Boolean isCumulative
 ) {
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
         allowMultipleScores = (allowMultipleScores != null) && allowMultipleScores;
+        isCumulative = (isCumulative != null) && isCumulative;
     }
 }

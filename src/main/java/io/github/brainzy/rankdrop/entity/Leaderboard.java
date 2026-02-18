@@ -43,4 +43,9 @@ public class Leaderboard {
     @Column(name = "allow_multiple_scores", nullable = false)
     @Schema(description = "If true, a player can have multiple entries. If false, only their best score is kept.", example = "false")
     private boolean allowMultipleScores = false;
+
+    @Builder.Default
+    @Column(name = "is_cumulative", nullable = false)
+    @Schema(description = "If true, new scores are added to the player's existing total. If false, only the best score is kept.", example = "false")
+    private boolean isCumulative = false;
 }

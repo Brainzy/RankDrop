@@ -32,6 +32,10 @@ public class ScoreService {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
+        if (leaderboard.isCumulative()) {
+            return handleCumulativeScoreSubmission(leaderboard, playerName, value);
+        }
+
         if (!leaderboard.isAllowMultipleScores()) {
             return handleSingleScoreSubmission(leaderboard, playerName, value);
         }
@@ -39,30 +43,18 @@ public class ScoreService {
         return createAndSaveScore(leaderboard, playerName, value);
     }
 
-    public List<ScoreEntry> getPlayerScoreWithSurrounding(String slug, String playerAlias, int surrounding) {
-        Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
-                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+    private ScoreEntry handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value) {
+        Optional<ScoreEntry> existingOpt = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
+                leaderboard.getSlug(), playerName, Sort.unsorted());
 
-        Sort.Direction bestSort = getSortDirection(leaderboard.getSortOrder());
-
-        ScoreEntry bestEntry = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(slug, playerAlias, Sort.by(bestSort, "scoreValue"))
-                .orElseThrow(() -> new RuntimeException("Player not found: " + playerAlias));
-
-        if (surrounding <= 0) {
-            return Collections.singletonList(bestEntry);
+        if (existingOpt.isEmpty()) {
+            return createAndSaveScore(leaderboard, playerName, value);
         }
 
-        Pageable limitHigher = PageRequest.of(0, surrounding + 1, Sort.by(Sort.Direction.ASC, "scoreValue"));
-        Pageable limitLower = PageRequest.of(0, surrounding, Sort.by(Sort.Direction.DESC, "scoreValue"));
-
-        List<ScoreEntry> higherScores = scoreRepository.findByLeaderboard_SlugAndScoreValueGreaterThanEqual(slug, bestEntry.getScoreValue(), limitHigher).getContent();
-        List<ScoreEntry> lowerScores = scoreRepository.findByLeaderboard_SlugAndScoreValueLessThan(slug, bestEntry.getScoreValue(), limitLower).getContent();
-
-        return Stream.concat(higherScores.stream(), lowerScores.stream())
-                .sorted((e1, e2) -> (leaderboard.getSortOrder() == SortOrder.ASC)
-                        ? Double.compare(e1.getScoreValue(), e2.getScoreValue())
-                        : Double.compare(e2.getScoreValue(), e1.getScoreValue()))
-                .collect(Collectors.toList());
+        ScoreEntry existing = existingOpt.get();
+        existing.setScoreValue(existing.getScoreValue() + value);
+        existing.setSubmittedAt(LocalDateTime.now());
+        return scoreRepository.save(existing);
     }
 
     private ScoreEntry handleSingleScoreSubmission(Leaderboard leaderboard, String playerName, double value) {
@@ -96,13 +88,39 @@ public class ScoreService {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
-        Sort.Direction direction = getSortDirection(leaderboard.getSortOrder());
+        Sort.Direction direction = resolveSortDirection(leaderboard.getSortOrder());
         Pageable pageable = PageRequest.of(0, limit, Sort.by(direction, "scoreValue"));
 
         return scoreRepository.findByLeaderboard_Slug(slug, pageable).getContent();
     }
 
-    private Sort.Direction getSortDirection(SortOrder sortOrder) {
+    public List<ScoreEntry> getPlayerScoreWithSurrounding(String slug, String playerAlias, int surrounding) {
+        Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+
+        Sort.Direction bestSort = resolveSortDirection(leaderboard.getSortOrder());
+
+        ScoreEntry bestEntry = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(slug, playerAlias, Sort.by(bestSort, "scoreValue"))
+                .orElseThrow(() -> new RuntimeException("Player not found: " + playerAlias));
+
+        if (surrounding <= 0) {
+            return Collections.singletonList(bestEntry);
+        }
+
+        Pageable limitHigher = PageRequest.of(0, surrounding + 1, Sort.by(Sort.Direction.ASC, "scoreValue"));
+        Pageable limitLower = PageRequest.of(0, surrounding, Sort.by(Sort.Direction.DESC, "scoreValue"));
+
+        List<ScoreEntry> higherScores = scoreRepository.findByLeaderboard_SlugAndScoreValueGreaterThanEqual(slug, bestEntry.getScoreValue(), limitHigher).getContent();
+        List<ScoreEntry> lowerScores = scoreRepository.findByLeaderboard_SlugAndScoreValueLessThan(slug, bestEntry.getScoreValue(), limitLower).getContent();
+
+        return Stream.concat(higherScores.stream(), lowerScores.stream())
+                .sorted((e1, e2) -> (leaderboard.getSortOrder() == SortOrder.ASC)
+                        ? Double.compare(e1.getScoreValue(), e2.getScoreValue())
+                        : Double.compare(e2.getScoreValue(), e1.getScoreValue()))
+                .collect(Collectors.toList());
+    }
+
+    private Sort.Direction resolveSortDirection(SortOrder sortOrder) {
         return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
     }
 

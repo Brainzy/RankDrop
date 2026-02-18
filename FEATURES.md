@@ -31,13 +31,14 @@ Current status of all features. ✅ = Implemented
 ### Board Types
 
 - [ ] All-time leaderboards (never reset)
+- [ ] Daily, Weekly, Monthly leaderboards (reset without saving or with)
 - [ ] Manual reset
 
 ### Scoring Modes
 
 - [✅] Descending sort (high score wins)
 - [✅] Ascending sort (speedrun/lowest time wins)
-- [ ] Cumulative mode (sum all player scores)
+- [✅] Cumulative mode (sum all player scores)
 - [✅] One max score per player or multiple entries allowed
 - [ ] Optional JSON/String metadata per score.
 
