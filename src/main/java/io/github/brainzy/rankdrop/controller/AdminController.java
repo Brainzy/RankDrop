@@ -4,8 +4,10 @@ import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
+import io.github.brainzy.rankdrop.entity.ScoreArchive;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -73,5 +75,26 @@ public class AdminController {
     public ResponseEntity<Void> reset(@PathVariable String slug, @Valid @RequestBody LeaderboardResetRequest request) {
         leaderboardService.resetLeaderboard(slug, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{slug}/history")
+    @Operation(
+            summary = "Get archived scores",
+            description = "Fetch historical scores from previous resets for this leaderboard."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved archived scores")
+    @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
+    public List<ScoreArchive> getArchivedScores(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug,
+
+            @Parameter(
+                    description = "Number of archived scores to return",
+                    example = "50",
+                    schema = @Schema(defaultValue = "50")
+            )
+            @RequestParam(defaultValue = "50") int limit
+    ) {
+        return leaderboardService.getArchivedScores(slug, limit);
     }
 }

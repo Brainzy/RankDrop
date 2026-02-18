@@ -10,6 +10,9 @@ import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreArchiveRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -76,6 +79,14 @@ public class LeaderboardService {
         // Clear entries
         board.getEntries().clear();
         leaderboardRepository.save(board);
+    }
+
+    public List<ScoreArchive> getArchivedScores(String slug, int limit) {
+        if (leaderboardRepository.findBySlug(slug).isEmpty()) {
+            throw new LeaderboardNotFoundException(slug);
+        }
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "archivedAt"));
+        return scoreArchiveRepository.findByLeaderboardSlug(slug, pageable);
     }
 
     private void archiveScores(Leaderboard board, String resetLabel) {
