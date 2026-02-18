@@ -14,12 +14,8 @@ public record ScoreSubmissionRequest(
         String playerAlias,
 
         @Schema(description = "Score to be added (Supports decimals)",
-                example = "1550.50",
-                minimum = "0",
-                maximum = "1000000") // ToDo update min and max from leaderboard config
+                example = "1550.50")
         @NotNull(message = "Score is required")
-        @Min(value = 0, message = "Score cannot be negative")
-        @Max(value = 1000000, message = "Score exceeds the maximum limit")
         Double scoreValue
 ) {
 }

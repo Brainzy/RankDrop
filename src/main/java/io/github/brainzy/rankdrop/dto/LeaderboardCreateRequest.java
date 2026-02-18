@@ -51,7 +51,13 @@ public record LeaderboardCreateRequest(
                 defaultValue = "false",
                 requiredMode = Schema.RequiredMode.NOT_REQUIRED
         )
-        Boolean isCumulative
+        Boolean isCumulative,
+
+        @Schema(description = "Optional minimum score value allowed for submission", example = "0")
+        Double minScore,
+
+        @Schema(description = "Optional maximum score value allowed for submission", example = "1000000")
+        Double maxScore
 ) {
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;

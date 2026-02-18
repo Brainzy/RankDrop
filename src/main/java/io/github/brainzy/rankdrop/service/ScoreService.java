@@ -34,6 +34,8 @@ public class ScoreService {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
+        validateScore(value, leaderboard);
+
         if (leaderboard.isCumulative()) {
             return handleCumulativeScoreSubmission(leaderboard, playerName, value);
         }
@@ -43,6 +45,15 @@ public class ScoreService {
         }
 
         return createAndSaveScore(leaderboard, playerName, value);
+    }
+
+    private void validateScore(double value, Leaderboard leaderboard) {
+        if (leaderboard.getMinScore() != null && value < leaderboard.getMinScore()) {
+            throw new IllegalArgumentException("Score is below the minimum allowed value of " + leaderboard.getMinScore());
+        }
+        if (leaderboard.getMaxScore() != null && value > leaderboard.getMaxScore()) {
+            throw new IllegalArgumentException("Score exceeds the maximum allowed value of " + leaderboard.getMaxScore());
+        }
     }
 
     private ScoreSubmitResponse handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value) {

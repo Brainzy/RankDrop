@@ -30,6 +30,8 @@ public class LeaderboardService {
                 .sortOrder(request.sortOrder())
                 .allowMultipleScores(request.allowMultipleScores())
                 .isCumulative(request.isCumulative())
+                .minScore(request.minScore())
+                .maxScore(request.maxScore())
                 .build();
         return leaderboardRepository.save(lb);
     }

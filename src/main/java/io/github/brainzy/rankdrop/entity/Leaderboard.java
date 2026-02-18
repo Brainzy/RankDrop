@@ -48,4 +48,10 @@ public class Leaderboard {
     @Column(name = "is_cumulative", nullable = false)
     @Schema(description = "If true, new scores are added to the player's existing total. If false, only the best score is kept.", example = "false")
     private boolean isCumulative = false;
+
+    @Schema(description = "Optional minimum score value allowed for submission, default is 0.", example = "0")
+    private Double minScore;
+
+    @Schema(description = "Optional maximum score value allowed for submission, default is 1000000", example = "1000000")
+    private Double maxScore;
 }
