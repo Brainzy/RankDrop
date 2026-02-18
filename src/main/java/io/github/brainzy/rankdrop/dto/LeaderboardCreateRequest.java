@@ -6,7 +6,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-@Schema(description = "Request object for creating a new leaderboard")
+@Schema(description = "Request object for creating a new leaderboard", example = """
+        {
+          "slug": "global-speedrun-v1",
+          "displayName": "Global Speedrun Rankings",
+          "sortOrder": "ASC",
+          "allowMultipleScores": false,
+          "isCumulative": false,
+          "minScore": 0,
+          "maxScore": 1000000
+        }
+        """)
 public record LeaderboardCreateRequest(
         @Schema(
                 description = "Unique identifier for the leaderboard. Used in API URLs.",
