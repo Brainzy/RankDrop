@@ -85,16 +85,13 @@ public class LeaderboardService {
     public void performReset(Leaderboard board, boolean archive, String resetLabel) {
         if (archive) {
             if (resetLabel == null || resetLabel.isBlank()) {
-                // Auto-generate label if missing (e.g. for automatic resets)
-                resetLabel = "Auto-Reset " + LocalDateTime.now().toString();
+                resetLabel = "Auto-Reset " + LocalDateTime.now();
             }
             archiveScores(board, resetLabel);
         }
 
-        // Clear entries
         board.getEntries().clear();
 
-        // Recalculate next reset if it's an automatic one
         if (board.getResetFrequency() != ResetFrequency.NONE) {
             calculateNextReset(board);
         }
