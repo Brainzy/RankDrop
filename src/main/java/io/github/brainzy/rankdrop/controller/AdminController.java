@@ -14,12 +14,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -80,33 +78,33 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/history")
+    @GetMapping("/archive")
     @Operation(
             summary = "Get global archive history",
             description = "Lists all archive snapshots across all leaderboards."
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved global archive history")
-    public List<ScoreArchiveSummary> getAllArchiveHistory() {
-        return leaderboardService.getAllArchiveHistory();
+    public List<ScoreArchiveSummary> getAllArchives() {
+        return leaderboardService.getAllArchives();
     }
 
-    @GetMapping("/history/{slug}/{archivedAt}")
+    @GetMapping("/archive/{slug}/{resetLabel}")
     @Operation(
             summary = "Get specific archived snapshot",
-            description = "Returns actual score entries for a specific archive snapshot."
+            description = "Returns actual score entries for a specific archive snapshot identified by its reset label."
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved archived scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreArchive> getArchivedScoresSnapshot(
+    public List<ScoreArchive> getArchivedScoresByLabel(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
-            @Parameter(description = "The timestamp of the archive snapshot", example = "2023-10-01T12:00:00")
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime archivedAt,
+            @Parameter(description = "The label of the archive snapshot", example = "Season 1")
+            @PathVariable String resetLabel,
 
             @Parameter(description = "Number of scores to return", example = "50")
             @RequestParam(defaultValue = "50") int limit
     ) {
-        return leaderboardService.getArchivedScoresSnapshot(slug, archivedAt, limit);
+        return leaderboardService.getArchivedScoresByLabel(slug, resetLabel, limit);
     }
 }

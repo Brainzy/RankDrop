@@ -82,16 +82,16 @@ public class LeaderboardService {
         leaderboardRepository.save(board);
     }
 
-    public List<ScoreArchiveSummary> getAllArchiveHistory() {
+    public List<ScoreArchiveSummary> getAllArchives() {
         return scoreArchiveRepository.findAllArchiveSummaries();
     }
 
-    public List<ScoreArchive> getArchivedScoresSnapshot(String slug, LocalDateTime archivedAt, int limit) {
+    public List<ScoreArchive> getArchivedScoresByLabel(String slug, String resetLabel, int limit) {
         if (leaderboardRepository.findBySlug(slug).isEmpty()) {
             throw new LeaderboardNotFoundException(slug);
         }
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "scoreValue"));
-        return scoreArchiveRepository.findByLeaderboardSlugAndArchivedAt(slug, archivedAt, pageable);
+        return scoreArchiveRepository.findByLeaderboardSlugAndResetLabel(slug, resetLabel, pageable);
     }
 
     private void archiveScores(Leaderboard board, String resetLabel) {
