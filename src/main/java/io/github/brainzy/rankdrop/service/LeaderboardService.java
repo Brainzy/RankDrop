@@ -2,6 +2,7 @@ package io.github.brainzy.rankdrop.service;
 
 import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
+import io.github.brainzy.rankdrop.dto.ScoreArchiveSummary;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.entity.ScoreArchive;
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
@@ -81,28 +82,33 @@ public class LeaderboardService {
         leaderboardRepository.save(board);
     }
 
-    public List<ScoreArchive> getArchivedScores(String slug, int limit) {
+    public List<ScoreArchiveSummary> getAllArchiveHistory() {
+        return scoreArchiveRepository.findAllArchiveSummaries();
+    }
+
+    public List<ScoreArchive> getArchivedScoresSnapshot(String slug, LocalDateTime archivedAt, int limit) {
         if (leaderboardRepository.findBySlug(slug).isEmpty()) {
             throw new LeaderboardNotFoundException(slug);
         }
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "archivedAt"));
-        return scoreArchiveRepository.findByLeaderboardSlug(slug, pageable);
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "scoreValue"));
+        return scoreArchiveRepository.findByLeaderboardSlugAndArchivedAt(slug, archivedAt, pageable);
     }
 
     private void archiveScores(Leaderboard board, String resetLabel) {
+        LocalDateTime now = LocalDateTime.now();
         List<ScoreArchive> archives = board.getEntries().stream()
-                .map(entry -> mapToArchive(entry, resetLabel))
+                .map(entry -> mapToArchive(entry, resetLabel, now))
                 .collect(Collectors.toList());
         scoreArchiveRepository.saveAll(archives);
     }
 
-    private ScoreArchive mapToArchive(ScoreEntry entry, String resetLabel) {
+    private ScoreArchive mapToArchive(ScoreEntry entry, String resetLabel, LocalDateTime archivedAt) {
         return ScoreArchive.builder()
                 .leaderboardSlug(entry.getLeaderboard().getSlug())
                 .playerAlias(entry.getPlayerAlias())
                 .scoreValue(entry.getScoreValue())
                 .submittedAt(entry.getSubmittedAt())
-                .archivedAt(LocalDateTime.now())
+                .archivedAt(archivedAt)
                 .resetLabel(resetLabel)
                 .build();
     }

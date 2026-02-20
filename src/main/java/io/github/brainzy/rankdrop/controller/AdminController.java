@@ -3,6 +3,7 @@ package io.github.brainzy.rankdrop.controller;
 import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
+import io.github.brainzy.rankdrop.dto.ScoreArchiveSummary;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.entity.ScoreArchive;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
@@ -13,14 +14,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/leaderboards")
+@RequestMapping("/api/v1/admin")
 @Tag(name = "Admin Leaderboard Management", description = "Privileged operations for managing leaderboard configurations")
 public class AdminController {
 
@@ -30,7 +33,7 @@ public class AdminController {
         this.leaderboardService = leaderboardService;
     }
 
-    @PostMapping
+    @PostMapping("/leaderboards")
     @Operation(summary = "Create a new leaderboard", description = "Initializes a leaderboard with a unique slug and sorting rules.")
     @ApiResponse(responseCode = "201", description = "Leaderboard created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
@@ -40,7 +43,7 @@ public class AdminController {
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{slug}")
+    @PutMapping("/leaderboards/{slug}")
     @Operation(summary = "Update leaderboard settings", description = "Allows changing the display name of an existing leaderboard.")
     @ApiResponse(responseCode = "200", description = "Leaderboard updated successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
@@ -51,7 +54,7 @@ public class AdminController {
         );
     }
 
-    @DeleteMapping("/{slug}")
+    @DeleteMapping("/leaderboards/{slug}")
     @Operation(summary = "Delete a leaderboard", description = "Permanently removes a leaderboard and all its associated scores.")
     @ApiResponse(responseCode = "204", description = "Leaderboard deleted successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
@@ -60,14 +63,14 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
+    @GetMapping("/leaderboards")
     @Operation(summary = "List all leaderboards", description = "Returns a complete list of all active leaderboard configurations.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved list of leaderboards")
     public List<Leaderboard> list() {
         return leaderboardService.getAllLeaderboards();
     }
 
-    @PostMapping("/{slug}/reset")
+    @PostMapping("/leaderboards/{slug}/reset")
     @Operation(summary = "Reset a leaderboard", description = "Clears all scores from a leaderboard, optionally archiving them first.")
     @ApiResponse(responseCode = "204", description = "Leaderboard reset successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
@@ -77,24 +80,33 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{slug}/history")
+    @GetMapping("/history")
     @Operation(
-            summary = "Get archived scores",
-            description = "Fetch historical scores from previous resets for this leaderboard."
+            summary = "Get global archive history",
+            description = "Lists all archive snapshots across all leaderboards."
+    )
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved global archive history")
+    public List<ScoreArchiveSummary> getAllArchiveHistory() {
+        return leaderboardService.getAllArchiveHistory();
+    }
+
+    @GetMapping("/history/{slug}/{archivedAt}")
+    @Operation(
+            summary = "Get specific archived snapshot",
+            description = "Returns actual score entries for a specific archive snapshot."
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved archived scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreArchive> getArchivedScores(
+    public List<ScoreArchive> getArchivedScoresSnapshot(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
-            @Parameter(
-                    description = "Number of archived scores to return",
-                    example = "50",
-                    schema = @Schema(defaultValue = "50")
-            )
+            @Parameter(description = "The timestamp of the archive snapshot", example = "2023-10-01T12:00:00")
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime archivedAt,
+
+            @Parameter(description = "Number of scores to return", example = "50")
             @RequestParam(defaultValue = "50") int limit
     ) {
-        return leaderboardService.getArchivedScores(slug, limit);
+        return leaderboardService.getArchivedScoresSnapshot(slug, archivedAt, limit);
     }
 }
