@@ -16,6 +16,9 @@ public record ScoreSubmissionRequest(
         @Schema(description = "Score to be added (Supports decimals)",
                 example = "1550.50")
         @NotNull(message = "Score is required")
-        Double scoreValue
+        Double scoreValue,
+
+        @Schema(description = "Optional metadata string associated with the score", example = "Level 5 - Warrior")
+        String metadata
 ) {
 }

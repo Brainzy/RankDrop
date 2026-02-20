@@ -59,7 +59,7 @@ public class LeaderboardController {
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
             @Valid @RequestBody ScoreSubmissionRequest request) {
-        return scoreService.submitScore(slug, request.playerAlias(), request.scoreValue());
+        return scoreService.submitScore(slug, request.playerAlias(), request.scoreValue(), request.metadata());
     }
 
     @GetMapping("/{slug}/players/{playerAlias}")

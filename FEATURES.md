@@ -25,6 +25,9 @@ Current status of all features. ✅ = Implemented
 - [ ] Smart cache invalidation on relevant writes
 - [ ] Batch database writes to reduce load
 - [ ] Connection pooling for database efficiency
+- [ ] Graceful degradation (serve cached data if DB down)
+
+---
 
 ## Leaderboard Types & Configuration
 
@@ -40,7 +43,9 @@ Current status of all features. ✅ = Implemented
 - [✅] Ascending sort (speedrun/lowest time wins)
 - [✅] Cumulative mode (sum all player scores)
 - [✅] One max score per player or multiple entries allowed
-- [ ] Optional JSON/String metadata per score.
+- [✅] Optional JSON/String metadata per score
+
+---
 
 ## Admin Operations
 
@@ -53,10 +58,13 @@ Current status of all features. ✅ = Implemented
 
 ### Moderation
 
-- [ ] Manually reset leaderboard (clear all scores)
+- [✅] Manually reset leaderboard (clear all scores)
 - [ ] Ban players globally (all leaderboards)
+- [ ] Player ban enforcement on score submission
 - [ ] Remove individual scores
 - [ ] View audit log of admin actions
+
+---
 
 ## Security & Rate Limiting
 
@@ -70,6 +78,10 @@ Current status of all features. ✅ = Implemented
 ### Rate Limiting
 
 - [ ] Per-leaderboard rate limiting (configurable)
+
+### Anti-Cheat
+
+- [ ] Suspicious score logging
 
 ---
 
@@ -103,6 +115,10 @@ Current status of all features. ✅ = Implemented
 - [ ] Migration script (H2 → PostgreSQL)
 - [ ] Connection pooling for PostgreSQL
 - [ ] Transaction management
+
+### Backup & Recovery
+
+- [ ] Automatic daily backups, configurable retention (default: 3 days)
 
 ---
 
@@ -160,11 +176,11 @@ Current status of all features. ✅ = Implemented
 ### Documentation
 
 - [✅] Interactive Swagger UI
-- [ ] Complete endpoint descriptions
-- [ ] Example requests for all endpoints
-- [ ] Example responses for all endpoints
-- [ ] Authentication flow documentation
-- [ ] Error code reference
+- [✅] Complete endpoint descriptions
+- [✅] Example requests for all endpoints
+- [✅] Example responses for all endpoints
+- [✅] Authentication flow documentation
+- [✅] Error code reference
 
 ### Developer Experience
 
@@ -204,86 +220,8 @@ Current status of all features. ✅ = Implemented
 
 ---
 
-## Additional Features (Future Consideration, outside of initial launch)
-
-- [ ] Friends-only leaderboard filtering
-- [ ] Pagination support (fetch arbitrary rank ranges)
-- [ ] Custom reset schedules (cron expression support)
-- [ ] Ban players from specific leaderboards
-- [ ] Suspicious score logging
-- [ ] Request timestamp validation
-- [ ] Player ban enforcement
-- [ ] Database file backups
-- [ ] Zero-downtime migration guide PostgreSQL
-- [ ] Rollback procedures documented
-- [ ] Request correlation IDs logging
-- [ ] Performance metrics logging
-- [ ] Database size growth analysis
-- [ ] Memory usage profiling
-- [ ] GraalVM native image support
-- [ ] Small image size (<60MB)
-
-### Self-Healing
-
-- [ ] Automatic restart on health check failures
-- [ ] Docker health check configuration
-- [ ] Exponential backoff for restart attempts
-- [ ] Alert notifications on service restarts
-- [ ] Graceful degradation (serve cached data if DB down)
-
-### Data Management
-
-- [ ] Automatic daily backups (via cron)
-- [ ] Configurable backup retention
-- [ ] Database size monitoring
-- [ ] Alert when approaching size limits
-- [ ] Data cleanup for old inactive leaderboards
-
-- ### Data Export
-
-- [ ] Export leaderboard data as CSV
-- [ ] Export leaderboard data as JSON
-- [ ] Backup entire database
-- [ ] Restore from backup
-
----
-
-### Analytics ⏳
-
-- [ ] Player retention metrics
-- [ ] Score distribution charts
-- [ ] Peak usage time analysis
-- [ ] Export to Google Sheets integration
-
-### Real-time Features ⏳
-
-- [ ] Server-Sent Events for leaderboard changes
-- [ ] Real-time rank change notifications
-
-### Advanced Features ⏳
-
-- [ ] Multi-region deployment support
-- [ ] Cross-region leaderboard aggregation
-- [ ] Friends system integration
-- [ ] Player profiles
-- [ ] Achievement tracking
-- [ ] Elo rating system
-- [ ] Seasonal leaderboards with rewards
-- [ ] Leaderboard brackets (skill-based grouping)
-
----
-
-## Legend
-
-- ✅ **Implemented** - Feature is complete and tested
-
 ## Version History
 
 ### v1.0.0 (Target: Q2 2026)
 
-Core leaderboard functionality with H2 database, Docker deployment, Unity SDK,
-and Swagger documentation.
-
-### v1.1.0 (Target: Q3 2026)
-
-Additional features
+Core leaderboard functionality with H2 database, Docker deployment, Unity SDK, and Swagger documentation.

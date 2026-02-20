@@ -17,14 +17,18 @@ public record ScoreEntryResponse(
         long rank,
 
         @Schema(description = "Timestamp when the score was submitted", example = "2023-10-01T12:00:00")
-        LocalDateTime submittedAt
+        LocalDateTime submittedAt,
+
+        @Schema(description = "Optional metadata associated with the score", example = "Level 5 - Warrior")
+        String metadata
 ) {
     public static ScoreEntryResponse fromEntity(ScoreEntry entry, long rank) {
         return new ScoreEntryResponse(
                 entry.getPlayerAlias(),
                 entry.getScoreValue(),
                 rank,
-                entry.getSubmittedAt()
+                entry.getSubmittedAt(),
+                entry.getMetadata()
         );
     }
 }

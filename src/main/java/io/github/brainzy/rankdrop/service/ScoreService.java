@@ -30,21 +30,21 @@ public class ScoreService {
     private final LeaderboardRepository leaderboardRepository;
 
     @Transactional
-    public ScoreSubmitResponse submitScore(String slug, String playerName, double value) {
+    public ScoreSubmitResponse submitScore(String slug, String playerName, double value, String metadata) {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
         validateScore(value, leaderboard);
 
         if (leaderboard.isCumulative()) {
-            return handleCumulativeScoreSubmission(leaderboard, playerName, value);
+            return handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
         }
 
         if (!leaderboard.isAllowMultipleScores()) {
-            return handleSingleScoreSubmission(leaderboard, playerName, value);
+            return handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
         }
 
-        return createAndSaveScore(leaderboard, playerName, value);
+        return createAndSaveScore(leaderboard, playerName, value, metadata);
     }
 
     private void validateScore(double value, Leaderboard leaderboard) {
@@ -56,44 +56,51 @@ public class ScoreService {
         }
     }
 
-    private ScoreSubmitResponse handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value) {
+    private ScoreSubmitResponse handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
         Optional<ScoreEntry> existingOpt = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
                 leaderboard.getSlug(), playerName, Sort.unsorted());
 
         if (existingOpt.isEmpty()) {
-            return createAndSaveScore(leaderboard, playerName, value);
+            return createAndSaveScore(leaderboard, playerName, value, metadata);
         }
 
         ScoreEntry existing = existingOpt.get();
         existing.setScoreValue(existing.getScoreValue() + value);
         existing.setSubmittedAt(LocalDateTime.now());
+        if (metadata != null) {
+            existing.setMetadata(metadata);
+        }
 
         return ScoreSubmitResponse.fromEntity(scoreRepository.save(existing));
     }
 
-    private ScoreSubmitResponse handleSingleScoreSubmission(Leaderboard leaderboard, String playerName, double value) {
+    private ScoreSubmitResponse handleSingleScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
         Optional<ScoreEntry> existingOpt = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
                 leaderboard.getSlug(), playerName, Sort.unsorted());
 
         if (existingOpt.isEmpty()) {
-            return createAndSaveScore(leaderboard, playerName, value);
+            return createAndSaveScore(leaderboard, playerName, value, metadata);
         }
 
         ScoreEntry existing = existingOpt.get();
         if (isNewScoreBetter(value, existing.getScoreValue(), leaderboard.getSortOrder())) {
             existing.setScoreValue(value);
             existing.setSubmittedAt(LocalDateTime.now());
+            if (metadata != null) {
+                existing.setMetadata(metadata);
+            }
             return ScoreSubmitResponse.fromEntity(scoreRepository.save(existing));
         }
 
         return ScoreSubmitResponse.fromEntity(existing);
     }
 
-    private ScoreSubmitResponse createAndSaveScore(Leaderboard leaderboard, String playerName, double value) {
+    private ScoreSubmitResponse createAndSaveScore(Leaderboard leaderboard, String playerName, double value, String metadata) {
         ScoreEntry entry = ScoreEntry.builder()
                 .playerAlias(playerName)
                 .scoreValue(value)
                 .leaderboard(leaderboard)
+                .metadata(metadata)
                 .build();
 
         return ScoreSubmitResponse.fromEntity(scoreRepository.save(entry));

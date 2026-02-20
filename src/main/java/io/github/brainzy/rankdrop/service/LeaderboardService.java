@@ -127,6 +127,7 @@ public class LeaderboardService {
                 .submittedAt(entry.getSubmittedAt())
                 .archivedAt(archivedAt)
                 .resetLabel(resetLabel)
+                .metadata(entry.getMetadata())
                 .build();
     }
 

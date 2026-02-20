@@ -26,4 +26,7 @@ public class ScoreArchive {
     private LocalDateTime archivedAt = LocalDateTime.now();
     
     private String resetLabel;
+
+    @Column(columnDefinition = "TEXT")
+    private String metadata;
 }

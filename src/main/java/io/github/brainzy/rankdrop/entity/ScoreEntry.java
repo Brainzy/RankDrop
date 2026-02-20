@@ -45,4 +45,8 @@ public class ScoreEntry {
     @Builder.Default
     @Schema(description = "Timestamp when the score was submitted", example = "2023-10-01T12:00:00")
     private LocalDateTime submittedAt = LocalDateTime.now();
+
+    @Schema(description = "Optional metadata string associated with the score", example = "Level 5 - Warrior")
+    @Column(columnDefinition = "TEXT")
+    private String metadata;
 }
