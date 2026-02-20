@@ -17,8 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(apiKeyInterceptor)
-                .addPathPatterns("/api/leaderboards/*/submit");
-        registry.addInterceptor(apiKeyInterceptor)
-                .addPathPatterns("/api/admin/**", "/api/leaderboards/**");
+                .addPathPatterns("/api/v1/**");
     }
 }

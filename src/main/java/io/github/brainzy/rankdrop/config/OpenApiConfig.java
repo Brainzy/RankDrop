@@ -18,17 +18,18 @@ public class OpenApiConfig {
                         .title("RankDrop API")
                         .version("1.0.0")
                         .description("Built for indie teams who want to own their data and scale without the stress of recurring costs or complex setup."))
-                .addSecurityItem(new SecurityRequirement()
-                        .addList("AdminAuth")
-                        .addList("GameAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("AdminAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("GameAuth"))
                 .components(new Components()
                         .addSecuritySchemes("AdminAuth", new SecurityScheme()
                                 .name("X-Admin-Token")
                                 .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER))
+                                .in(SecurityScheme.In.HEADER)
+                                .description("Required for all /api/v1/admin/** endpoints"))
                         .addSecuritySchemes("GameAuth", new SecurityScheme()
                                 .name("X-Game-Key")
                                 .type(SecurityScheme.Type.APIKEY)
-                                .in(SecurityScheme.In.HEADER)));
+                                .in(SecurityScheme.In.HEADER)
+                                .description("Required for POST /scores endpoints")));
     }
 }
