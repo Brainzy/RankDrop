@@ -4,6 +4,7 @@ import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.ScoreArchiveSummary;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
+import io.github.brainzy.rankdrop.entity.ResetFrequency;
 import io.github.brainzy.rankdrop.entity.ScoreArchive;
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.github.brainzy.rankdrop.exception.LeaderboardAlreadyExistsException;
@@ -16,7 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +48,12 @@ public class LeaderboardService {
                 .isCumulative(request.isCumulative())
                 .minScore(request.minScore())
                 .maxScore(request.maxScore())
+                .resetFrequency(request.resetFrequency())
+                .archiveOnReset(request.archiveOnReset())
                 .build();
+
+        calculateNextReset(lb);
+
         return leaderboardRepository.save(lb);
     }
 
@@ -70,15 +79,26 @@ public class LeaderboardService {
         Leaderboard board = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
-        if (request.archiveScores()) {
-            if (request.resetLabel() == null || request.resetLabel().isBlank()) {
-                throw new IllegalArgumentException("resetLabel is required when archiveScores is true");
+        performReset(board, request.archiveScores(), request.resetLabel());
+    }
+
+    public void performReset(Leaderboard board, boolean archive, String resetLabel) {
+        if (archive) {
+            if (resetLabel == null || resetLabel.isBlank()) {
+                // Auto-generate label if missing (e.g. for automatic resets)
+                resetLabel = "Auto-Reset " + LocalDateTime.now().toString();
             }
-            archiveScores(board, request.resetLabel());
+            archiveScores(board, resetLabel);
         }
 
         // Clear entries
         board.getEntries().clear();
+
+        // Recalculate next reset if it's an automatic one
+        if (board.getResetFrequency() != ResetFrequency.NONE) {
+            calculateNextReset(board);
+        }
+
         leaderboardRepository.save(board);
     }
 
@@ -111,5 +131,25 @@ public class LeaderboardService {
                 .archivedAt(archivedAt)
                 .resetLabel(resetLabel)
                 .build();
+    }
+
+    private void calculateNextReset(Leaderboard lb) {
+        if (lb.getResetFrequency() == ResetFrequency.NONE) {
+            lb.setNextResetAt(null);
+            return;
+        }
+
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("UTC"));
+        LocalDateTime next = switch (lb.getResetFrequency()) {
+            case DAILY -> atMidnight(now.plusDays(1));
+            case WEEKLY -> atMidnight(now.with(TemporalAdjusters.next(DayOfWeek.MONDAY)));
+            case MONTHLY -> atMidnight(now.with(TemporalAdjusters.firstDayOfNextMonth()));
+            default -> null;
+        };
+        lb.setNextResetAt(next);
+    }
+
+    private static LocalDateTime atMidnight(LocalDateTime dt) {
+        return dt.withHour(0).withMinute(0).withSecond(0).withNano(0);
     }
 }

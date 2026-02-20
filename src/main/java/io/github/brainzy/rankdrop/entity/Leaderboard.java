@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -56,4 +57,18 @@ public class Leaderboard {
     @Builder.Default
     @Schema(description = "Optional maximum score value allowed for submission, default is 1000000.", example = "1000000")
     private Double maxScore = 1000000.0;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reset_frequency", nullable = false)
+    @Schema(description = "Frequency of automatic resets", example = "NONE")
+    private ResetFrequency resetFrequency = ResetFrequency.NONE;
+
+    @Builder.Default
+    @Column(name = "archive_on_reset", nullable = false)
+    @Schema(description = "If true, scores are archived before automatic reset", example = "false")
+    private boolean archiveOnReset = false;
+
+    @Schema(description = "Timestamp of the next scheduled reset", example = "2023-11-01T00:00:00")
+    private LocalDateTime nextResetAt;
 }

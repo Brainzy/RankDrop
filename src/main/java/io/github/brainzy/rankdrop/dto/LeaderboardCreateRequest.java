@@ -1,5 +1,6 @@
 package io.github.brainzy.rankdrop.dto;
 
+import io.github.brainzy.rankdrop.entity.ResetFrequency;
 import io.github.brainzy.rankdrop.entity.SortOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -14,7 +15,9 @@ import jakarta.validation.constraints.Size;
           "allowMultipleScores": false,
           "isCumulative": false,
           "minScore": 0,
-          "maxScore": 1000000
+          "maxScore": 1000000,
+          "resetFrequency": "NONE",
+          "archiveOnReset": false
         }
         """)
 public record LeaderboardCreateRequest(
@@ -67,7 +70,23 @@ public record LeaderboardCreateRequest(
         Double minScore,
 
         @Schema(description = "Optional maximum score value allowed for submission", example = "1000000", defaultValue = "1000000")
-        Double maxScore
+        Double maxScore,
+
+        @Schema(
+                description = "Frequency of automatic resets. NONE (default), DAILY, WEEKLY, MONTHLY.",
+                example = "NONE",
+                defaultValue = "NONE",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        ResetFrequency resetFrequency,
+
+        @Schema(
+                description = "If true, scores are archived before automatic reset. Default is false.",
+                example = "false",
+                defaultValue = "false",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+        )
+        Boolean archiveOnReset
 ) {
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
@@ -75,5 +94,7 @@ public record LeaderboardCreateRequest(
         isCumulative = (isCumulative != null) && isCumulative;
         minScore = (minScore == null) ? 0.0 : minScore;
         maxScore = (maxScore == null) ? 1000000.0 : maxScore;
+        resetFrequency = (resetFrequency == null) ? ResetFrequency.NONE : resetFrequency;
+        archiveOnReset = (archiveOnReset != null) && archiveOnReset;
     }
 }

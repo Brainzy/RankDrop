@@ -30,9 +30,9 @@ Current status of all features. ✅ = Implemented
 
 ### Board Types
 
-- [ ] All-time leaderboards (never reset)
-- [ ] Daily, Weekly, Monthly leaderboards (reset without saving or with)
-- [ ] Manual reset
+- [✅] All-time leaderboards (never reset)
+- [✅] Daily, Weekly, Monthly leaderboards (reset without saving or with)
+- [✅] Manual reset
 
 ### Scoring Modes
 
