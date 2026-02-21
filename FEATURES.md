@@ -60,7 +60,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Manually reset leaderboard (clear all scores)
 - [✅] Ban players globally (all leaderboards)
 - [✅] Player ban enforcement on score submission
-- [ ] Remove individual scores
+- [✅] Remove individual scores
 - [ ] View audit log of admin actions
 
 ---

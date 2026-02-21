@@ -5,6 +5,7 @@ import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
+import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,9 +24,11 @@ import java.util.List;
 public class AdminLeaderboardController {
 
     private final LeaderboardService leaderboardService;
+    private final ScoreService scoreService;
 
-    public AdminLeaderboardController(LeaderboardService leaderboardService) {
+    public AdminLeaderboardController(LeaderboardService leaderboardService, ScoreService scoreService) {
         this.leaderboardService = leaderboardService;
+        this.scoreService = scoreService;
     }
 
     @PostMapping("/leaderboards")
@@ -72,6 +75,15 @@ public class AdminLeaderboardController {
     @ApiResponse(responseCode = "400", description = "Invalid input (e.g. missing resetLabel when archiving)", content = @Content(schema = @Schema(hidden = true)))
     public ResponseEntity<Void> reset(@PathVariable String slug, @Valid @RequestBody LeaderboardResetRequest request) {
         leaderboardService.resetLeaderboard(slug, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/scores/{scoreId}")
+    @Operation(summary = "Remove individual score", description = "Removes a specific score entry from its leaderboard.")
+    @ApiResponse(responseCode = "204", description = "Score removed successfully")
+    @ApiResponse(responseCode = "404", description = "Score entry not found", content = @Content(schema = @Schema(hidden = true)))
+    public ResponseEntity<Void> removeScore(@PathVariable Long scoreId) {
+        scoreService.removeScore(scoreId);
         return ResponseEntity.noContent().build();
     }
 }

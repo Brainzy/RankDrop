@@ -187,6 +187,16 @@ public class ScoreService {
         return result;
     }
 
+    @Transactional
+    public void removeScore(Long scoreId) {
+        ScoreEntry scoreEntry = scoreRepository.findById(scoreId)
+                .orElseThrow(() -> new IllegalArgumentException("Score entry not found with ID: " + scoreId));
+        
+        String leaderboardSlug = scoreEntry.getLeaderboard().getSlug();
+        scoreRepository.delete(scoreEntry);
+        scoreCacheService.evictTopScoresCache(leaderboardSlug);
+    }
+
     private Sort.Direction resolveSortDirection(SortOrder sortOrder) {
         return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
     }
