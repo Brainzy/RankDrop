@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 @Schema(description = "Request object for submitting a new score")
 public record ScoreSubmissionRequest(
         @Schema(description = "Displayed player alias",
-                example = "SpeedRunner99",
+                example = "PlayerOne",
                 minLength = 1,
                 maxLength = 20)
         @NotBlank(message = "Player alias is required")

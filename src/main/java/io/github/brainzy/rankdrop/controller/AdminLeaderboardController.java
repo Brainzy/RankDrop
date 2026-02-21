@@ -8,6 +8,7 @@ import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,7 +48,9 @@ public class AdminLeaderboardController {
     @ApiResponse(responseCode = "200", description = "Leaderboard updated successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
-    public ResponseEntity<Leaderboard> update(@PathVariable String slug, @Valid @RequestBody LeaderboardUpdateRequest request) {
+    public ResponseEntity<Leaderboard> update(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug, @Valid @RequestBody LeaderboardUpdateRequest request) {
         return ResponseEntity.ok(
                 leaderboardService.updateExistingLeaderboard(slug, request.displayName())
         );
@@ -57,7 +60,9 @@ public class AdminLeaderboardController {
     @Operation(summary = "Delete a leaderboard", description = "Permanently removes a leaderboard and all its associated scores.")
     @ApiResponse(responseCode = "204", description = "Leaderboard deleted successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public ResponseEntity<Void> delete(@PathVariable String slug) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug) {
         leaderboardService.deleteLeaderboardBySlug(slug);
         return ResponseEntity.noContent().build();
     }
@@ -74,7 +79,9 @@ public class AdminLeaderboardController {
     @ApiResponse(responseCode = "204", description = "Leaderboard reset successfully")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     @ApiResponse(responseCode = "400", description = "Invalid input (e.g. missing resetLabel when archiving)", content = @Content(schema = @Schema(hidden = true)))
-    public ResponseEntity<Void> reset(@PathVariable String slug, @Valid @RequestBody LeaderboardResetRequest request) {
+    public ResponseEntity<Void> reset(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug, @Valid @RequestBody LeaderboardResetRequest request) {
         leaderboardService.resetLeaderboard(slug, request);
         return ResponseEntity.noContent().build();
     }
@@ -83,7 +90,9 @@ public class AdminLeaderboardController {
     @Operation(summary = "Remove individual score", description = "Removes a specific score entry from its leaderboard.")
     @ApiResponse(responseCode = "204", description = "Score removed successfully")
     @ApiResponse(responseCode = "404", description = "Score entry not found", content = @Content(schema = @Schema(hidden = true)))
-    public ResponseEntity<Void> removeScore(@PathVariable Long scoreId) {
+    public ResponseEntity<Void> removeScore(
+            @Parameter(description = "The internal ID of the score entry to remove", example = "1")
+            @PathVariable Long scoreId) {
         scoreService.removeScore(scoreId);
         return ResponseEntity.noContent().build();
     }
@@ -92,7 +101,9 @@ public class AdminLeaderboardController {
     @Operation(summary = "List all scores for leaderboard", description = "Returns all score entries for a specific leaderboard with their ranks.")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved all scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntryResponse> getAllScoresForLeaderboard(@PathVariable String slug) {
+    public List<ScoreEntryResponse> getAllScoresForLeaderboard(
+            @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
+            @PathVariable String slug) {
         return scoreService.getAllScoresForLeaderboard(slug);
     }
 }
