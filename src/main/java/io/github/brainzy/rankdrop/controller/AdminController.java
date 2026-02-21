@@ -5,8 +5,10 @@ import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
 import io.github.brainzy.rankdrop.dto.ScoreArchiveSummary;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
+import io.github.brainzy.rankdrop.entity.Player;
 import io.github.brainzy.rankdrop.entity.ScoreArchive;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
+import io.github.brainzy.rankdrop.service.PlayerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,9 +28,23 @@ import java.util.List;
 public class AdminController {
 
     private final LeaderboardService leaderboardService;
+    private final PlayerService playerService;
 
-    public AdminController(LeaderboardService leaderboardService) {
+    public AdminController(LeaderboardService leaderboardService, PlayerService playerService) {
+
         this.leaderboardService = leaderboardService;
+        this.playerService = playerService;
+    }
+
+    @PostMapping("/players/{playerAlias}/ban")
+    @Operation(summary = "Ban a player globally", description = "Bans a player from submitting scores to all leaderboards.")
+    @ApiResponse(responseCode = "200", description = "Player banned successfully")
+    public ResponseEntity<Player> banPlayer(
+            @PathVariable String playerAlias,
+            @RequestParam(required = false) String reason
+    ) {
+        Player bannedPlayer = playerService.banPlayer(playerAlias, reason);
+        return ResponseEntity.ok(bannedPlayer);
     }
 
     @PostMapping("/leaderboards")

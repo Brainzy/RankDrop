@@ -6,6 +6,7 @@ import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.github.brainzy.rankdrop.entity.SortOrder;
 import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
+import io.github.brainzy.rankdrop.exception.PlayerBannedException;
 import io.github.brainzy.rankdrop.exception.PlayerNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreEntryRepository;
@@ -30,11 +31,16 @@ public class ScoreService {
     private final ScoreEntryRepository scoreRepository;
     private final LeaderboardRepository leaderboardRepository;
     private final ScoreCacheService scoreCacheService;
+    private final PlayerService playerService;
 
     @Transactional
     public ScoreSubmitResponse submitScore(String slug, String playerName, double value, String metadata) {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+
+        if (playerService.isPlayerBanned(playerName)) {
+            throw new PlayerBannedException(playerName);
+        }
 
         validateScore(value, leaderboard);
 
