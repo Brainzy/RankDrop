@@ -51,6 +51,10 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
+        if (path.startsWith("/actuator")) {
+            return true;
+        }
+
         if (path.startsWith("/api/v1/admin")) {
             return validateHeader(response, request.getHeader("X-Admin-Token"), adminSecret);
         }
