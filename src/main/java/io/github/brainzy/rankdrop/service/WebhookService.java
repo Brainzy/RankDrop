@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +36,9 @@ public class WebhookService {
 
         try {
             WebhookPayload payload = new WebhookPayload("NEW_TOP_SCORE", slug,
-                    playerAlias, score, rank, LocalDateTime.now().toString());
+                    playerAlias, score, rank, LocalDateTime.now(ZoneOffset.UTC).toString());
             restClient.post().uri(webhookUrl).body(payload).retrieve().toBodilessEntity();
-            systemSettingService.setSetting("WEBHOOK_LAST_FIRED", LocalDateTime.now().toString());
+            systemSettingService.setSetting("WEBHOOK_LAST_FIRED", LocalDateTime.now(ZoneOffset.UTC).toString());
         } catch (Exception e) {
             log.warn("Webhook failed: {}", e.getMessage());
         }
@@ -50,6 +51,6 @@ public class WebhookService {
         }
 
         long cooldown = Long.parseLong(systemSettingService.getSetting("WEBHOOK_COOLDOWN_MS", "10000"));
-        return LocalDateTime.parse(lastFired).plusNanos(cooldown * 1_000_000L).isBefore(LocalDateTime.now());
+        return LocalDateTime.parse(lastFired).plusNanos(cooldown * 1_000_000L).isBefore(LocalDateTime.now(ZoneOffset.UTC));
     }
 }

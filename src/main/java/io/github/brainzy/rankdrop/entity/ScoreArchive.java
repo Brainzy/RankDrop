@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "score_archive")
@@ -23,7 +24,7 @@ public class ScoreArchive {
     private LocalDateTime submittedAt;
     
     @Builder.Default
-    private LocalDateTime archivedAt = LocalDateTime.now();
+    private LocalDateTime archivedAt = LocalDateTime.now(ZoneOffset.UTC);
     
     private String resetLabel;
 

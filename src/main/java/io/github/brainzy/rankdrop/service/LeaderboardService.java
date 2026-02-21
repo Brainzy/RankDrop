@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -89,7 +90,7 @@ public class LeaderboardService {
     public void performReset(Leaderboard board, boolean archive, String resetLabel) {
         if (archive) {
             if (resetLabel == null || resetLabel.isBlank()) {
-                resetLabel = "Auto-Reset " + LocalDateTime.now();
+                resetLabel = "Auto-Reset " + LocalDateTime.now(ZoneOffset.UTC);
             }
             archiveScores(board, resetLabel);
         }
@@ -119,7 +120,7 @@ public class LeaderboardService {
     }
 
     private void archiveScores(Leaderboard board, String resetLabel) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(board.getSlug(), Pageable.unpaged()).getContent();
 
         List<ScoreArchive> archives = entries.stream()

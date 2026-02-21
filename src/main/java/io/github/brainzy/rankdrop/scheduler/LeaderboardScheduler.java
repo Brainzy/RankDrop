@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class LeaderboardScheduler {
     @Scheduled(fixedRate = 60000) // Run every minute
     @Transactional
     public void processScheduledResets() {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         List<Leaderboard> dueResets = leaderboardRepository.findAllByNextResetAtBefore(now);
 
         for (Leaderboard lb : dueResets) {

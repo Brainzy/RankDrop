@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 
 @Component
@@ -109,7 +110,7 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
         response.setCharacterEncoding("UTF-8");
 
         String json = objectMapper.writeValueAsString(Map.of(
-                "timestamp", LocalDateTime.now().toString(),
+                "timestamp", LocalDateTime.now(ZoneOffset.UTC).toString(),
                 "status", 401,
                 "error", "Unauthorized",
                 "message", message

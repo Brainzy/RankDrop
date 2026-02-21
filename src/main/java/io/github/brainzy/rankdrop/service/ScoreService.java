@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -89,7 +90,7 @@ public class ScoreService {
 
         ScoreEntry existing = existingOpt.get();
         existing.setScoreValue(existing.getScoreValue() + value);
-        existing.setSubmittedAt(LocalDateTime.now());
+        existing.setSubmittedAt(LocalDateTime.now(ZoneOffset.UTC));
         if (metadata != null) {
             existing.setMetadata(metadata);
         }
@@ -108,7 +109,7 @@ public class ScoreService {
         ScoreEntry existing = existingOpt.get();
         if (isNewScoreBetter(value, existing.getScoreValue(), leaderboard.getSortOrder())) {
             existing.setScoreValue(value);
-            existing.setSubmittedAt(LocalDateTime.now());
+            existing.setSubmittedAt(LocalDateTime.now(ZoneOffset.UTC));
             if (metadata != null) {
                 existing.setMetadata(metadata);
             }

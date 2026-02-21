@@ -8,6 +8,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "score_entries", indexes = {
@@ -36,6 +37,7 @@ public class ScoreEntry {
 
     @NotBlank(message = "Player alias is required")
     @Schema(description = "The player's display name", example = "PlayerOne")
+    @Column(nullable = false, length = 50)
     private String playerAlias;
 
     @PositiveOrZero
@@ -44,7 +46,7 @@ public class ScoreEntry {
 
     @Builder.Default
     @Schema(description = "Timestamp when the score was submitted", example = "2023-10-01T12:00:00")
-    private LocalDateTime submittedAt = LocalDateTime.now();
+    private LocalDateTime submittedAt = LocalDateTime.now(ZoneOffset.UTC);
 
     @Schema(description = "Optional metadata string associated with the score", example = "Level 5 - Warrior")
     @Column(columnDefinition = "TEXT")

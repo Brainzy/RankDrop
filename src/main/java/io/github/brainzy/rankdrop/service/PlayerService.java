@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 @Service
@@ -22,7 +23,7 @@ public class PlayerService {
                 .orElseGet(() -> createPlayer(playerAlias));
 
         player.setBanned(true);
-        player.setBannedAt(LocalDateTime.now());
+        player.setBannedAt(LocalDateTime.now(ZoneOffset.UTC));
         player.setBannedReason(reason);
 
         return playerRepository.save(player);
