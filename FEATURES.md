@@ -83,8 +83,8 @@ Current status of all features. ✅ = Implemented
 
 ### Webhooks
 
-- [ ] Trigger on new top N score (configurable N)
-- [ ] Configurable cooldown between webhook calls
+- [✅] Trigger on new top N score (configurable N)
+- [✅] Configurable cooldown between webhook calls
 
 ### Client SDKs
 

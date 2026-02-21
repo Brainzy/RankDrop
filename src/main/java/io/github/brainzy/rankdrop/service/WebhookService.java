@@ -18,14 +18,20 @@ public class WebhookService {
     private final RestClient restClient;
 
     @Async
-    public void fireTopScoreWebhook(String slug, String playerAlias, double score, int rank) {
+    public void fireTopScoreWebhookIfEligible(String slug, String playerAlias, double score, int rank) {
         String webhookUrl = systemSettingService.getSetting("WEBHOOK_URL");
-        if (webhookUrl == null || webhookUrl.isBlank()) return;
+        if (webhookUrl == null || webhookUrl.isBlank()) {
+            return;
+        }
 
         int topN = Integer.parseInt(systemSettingService.getSetting("WEBHOOK_TOP_N", "10"));
-        if (rank > topN) return;
+        if (rank > topN) {
+            return;
+        }
 
-        if (!isCooldownExpired()) return;
+        if (!isCooldownExpired()) {
+            return;
+        }
 
         try {
             WebhookPayload payload = new WebhookPayload("NEW_TOP_SCORE", slug,
@@ -39,8 +45,9 @@ public class WebhookService {
 
     private boolean isCooldownExpired() {
         String lastFired = systemSettingService.getSetting("WEBHOOK_LAST_FIRED");
-        if (lastFired == null)
+        if (lastFired == null) {
             return true;
+        }
 
         long cooldown = Long.parseLong(systemSettingService.getSetting("WEBHOOK_COOLDOWN_MS", "10000"));
         return LocalDateTime.parse(lastFired).plusNanos(cooldown * 1_000_000L).isBefore(LocalDateTime.now());

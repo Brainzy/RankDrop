@@ -32,6 +32,7 @@ public class ScoreService {
     private final LeaderboardRepository leaderboardRepository;
     private final ScoreCacheService scoreCacheService;
     private final PlayerService playerService;
+    private final WebhookService webhookService;
 
     @Transactional
     public ScoreSubmitResponse submitScore(String slug, String playerName, double value, String metadata) {
@@ -63,6 +64,8 @@ public class ScoreService {
         if (betterScoresCount < 100) {
             scoreCacheService.evictTopScoresCache(slug);
         }
+
+        webhookService.fireTopScoreWebhookIfEligible(slug, playerName, value, (int) betterScoresCount + 1);
 
         return response;
     }
