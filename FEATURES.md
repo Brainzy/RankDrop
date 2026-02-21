@@ -102,7 +102,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Zero-configuration embedded database
 - [✅] Single-file storage
 - [✅] Optimized indexes for leaderboard queries
-- [ ] Automatic schema migrations
+- [✅] Automatic schema migrations
 
 ### PostgreSQL Support
 
