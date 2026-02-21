@@ -1,5 +1,6 @@
 package io.github.brainzy.rankdrop.controller;
 
+import io.github.brainzy.rankdrop.dto.BackupConfigRequest;
 import io.github.brainzy.rankdrop.dto.RotateKeyRequest;
 import io.github.brainzy.rankdrop.dto.WebhookConfigRequest;
 import io.github.brainzy.rankdrop.service.SystemSettingService;
@@ -64,7 +65,9 @@ public class AdminSettingsController {
                     "WEBHOOK_URL",
                     "WEBHOOK_TOP_N",
                     "WEBHOOK_COOLDOWN_MS",
-                    "WEBHOOK_LAST_FIRED"
+                    "WEBHOOK_LAST_FIRED",
+                    "BACKUP_RETENTION_DAYS",
+                    "BACKUP_PATH"
             );
 
             Map<String, String> settings = settingKeys.stream()
@@ -109,6 +112,31 @@ public class AdminSettingsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "error", "Failed to configure webhook",
+                            "message", e.getMessage()
+                    ));
+        }
+    }
+    
+    @PostMapping("/settings/backup")
+    @Operation(summary = "Configure backup settings", description = "Updates backup configuration settings.")
+    @ApiResponse(responseCode = "200", description = "Backup configured successfully", content = @Content(schema = @Schema(example = "{\"message\": \"Backup configured successfully\"}")))
+    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content(schema = @Schema(example = "{\"error\": \"Invalid request\", \"message\": \"Retention days must be positive\"}")))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(example = "{\"error\": \"Failed to configure backup\", \"message\": \"Database connection failed\"}")))
+    public ResponseEntity<Map<String, String>> configureBackup(@RequestBody BackupConfigRequest request) {
+        try {
+            if (request.retentionDays() != null && request.retentionDays() > 0) {
+                systemSettingService.setSetting("BACKUP_RETENTION_DAYS", request.retentionDays().toString());
+            }
+            
+            if (request.backupPath() != null && !request.backupPath().isBlank()) {
+                systemSettingService.setSetting("BACKUP_PATH", request.backupPath());
+            }
+            
+            return ResponseEntity.ok(Map.of("message", "Backup configured successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Failed to configure backup",
                             "message", e.getMessage()
                     ));
         }

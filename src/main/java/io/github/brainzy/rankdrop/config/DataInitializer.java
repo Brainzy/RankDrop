@@ -37,6 +37,16 @@ public class DataInitializer {
                 log.warn("WEBHOOK_URL looks invalid: {}", webhookUrl);
             }
 
+            if (systemSettingService.getSetting("BACKUP_RETENTION_DAYS") == null) {
+                systemSettingService.setSetting("BACKUP_RETENTION_DAYS", "3");
+                log.info("Seeded default backup retention days: 3");
+            }
+
+            if (systemSettingService.getSetting("BACKUP_PATH") == null) {
+                systemSettingService.setSetting("BACKUP_PATH", "./backups");
+                log.info("Seeded default backup path: ./backups");
+            }
+
             log.info("RankDrop started successfully");
         };
     }

@@ -112,7 +112,7 @@ Current status of all features. ✅ = Implemented
 
 ### Backup & Recovery
 
-- [ ] Automatic daily backups, configurable retention (default: 3 days)
+- [✅] Automatic daily backups, configurable retention (default: 3 days)
 
 ---
 
