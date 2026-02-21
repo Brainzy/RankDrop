@@ -47,6 +47,22 @@ public class AdminController {
         return ResponseEntity.ok(bannedPlayer);
     }
 
+    @DeleteMapping("/players/{playerAlias}/ban")
+    @Operation(summary = "Unban a player globally", description = "Removes a ban from a player, allowing them to submit scores again.")
+    @ApiResponse(responseCode = "200", description = "Player unbanned successfully")
+    @ApiResponse(responseCode = "404", description = "Player not found", content = @Content(schema = @Schema(hidden = true)))
+    public ResponseEntity<Player> unbanPlayer(@PathVariable String playerAlias) {
+        Player unbannedPlayer = playerService.unbanPlayer(playerAlias);
+        return ResponseEntity.ok(unbannedPlayer);
+    }
+
+    @GetMapping("/players/banned")
+    @Operation(summary = "List all banned players", description = "Returns a list of all currently banned players.")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved list of banned players")
+    public List<Player> getAllBannedPlayers() {
+        return playerService.getAllBannedPlayers();
+    }
+
     @PostMapping("/leaderboards")
     @Operation(summary = "Create a new leaderboard", description = "Initializes a leaderboard with a unique slug and sorting rules.")
     @ApiResponse(responseCode = "201", description = "Leaderboard created successfully")

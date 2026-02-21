@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +30,7 @@ public class PlayerService {
 
     @Transactional
     public Player unbanPlayer(String playerAlias) {
-        Player player = playerRepository.findByPlayerAlias(playerAlias)
-                .orElseThrow(() -> new PlayerNotFoundException(playerAlias));
+        Player player = playerRepository.findByPlayerAlias(playerAlias).orElseThrow(() -> new PlayerNotFoundException(playerAlias));
 
         player.setBanned(false);
         player.setBannedAt(null);
@@ -50,6 +50,11 @@ public class PlayerService {
     public Player getPlayerByAlias(String playerAlias) {
         return playerRepository.findByPlayerAlias(playerAlias)
                 .orElseThrow(() -> new PlayerNotFoundException(playerAlias));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Player> getAllBannedPlayers() {
+        return playerRepository.findByBannedTrue();
     }
 
     private Player createPlayer(String playerAlias) {
