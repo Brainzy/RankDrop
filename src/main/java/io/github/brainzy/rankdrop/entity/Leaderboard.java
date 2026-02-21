@@ -1,15 +1,15 @@
 package io.github.brainzy.rankdrop.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "leaderboards")
+@Table(name = "leaderboards", indexes = {
+        @Index(name = "idx_leaderboard_slug", columnList = "slug")
+})
 @Getter
 @Setter
 @Builder
@@ -26,13 +26,9 @@ public class Leaderboard {
     @Schema(description = "Unique slug for the leaderboard", example = "global-high-scores")
     private String slug;
 
+    @Column(nullable = false)
     @Schema(description = "Display name of the leaderboard", example = "Global High Scores")
     private String displayName;
-
-    @JsonManagedReference
-    @OneToMany(mappedBy = "leaderboard", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Schema(description = "List of score entries associated with this leaderboard")
-    private List<ScoreEntry> entries;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
@@ -48,13 +44,15 @@ public class Leaderboard {
     @Builder.Default
     @Column(name = "is_cumulative", nullable = false)
     @Schema(description = "If true, new scores are added to the player's existing total. If false, only the best score is kept.", example = "false")
-    private boolean isCumulative = false;
+    private boolean cumulative = false;
 
     @Builder.Default
+    @Column(name = "min_score")
     @Schema(description = "Optional minimum score value allowed for submission, default is 0.", example = "0")
     private Double minScore = 0.0;
 
     @Builder.Default
+    @Column(name = "max_score")
     @Schema(description = "Optional maximum score value allowed for submission, default is 1000000.", example = "1000000")
     private Double maxScore = 1000000.0;
 
@@ -69,6 +67,7 @@ public class Leaderboard {
     @Schema(description = "If true, scores are archived before automatic reset", example = "false")
     private boolean archiveOnReset = false;
 
+    @Column(name = "next_reset_at")
     @Schema(description = "Timestamp of the next scheduled reset", example = "2023-11-01T00:00:00")
     private LocalDateTime nextResetAt;
 }

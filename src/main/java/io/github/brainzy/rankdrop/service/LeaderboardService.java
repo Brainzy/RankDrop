@@ -11,6 +11,7 @@ import io.github.brainzy.rankdrop.exception.LeaderboardAlreadyExistsException;
 import io.github.brainzy.rankdrop.exception.LeaderboardNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreArchiveRepository;
+import io.github.brainzy.rankdrop.repository.ScoreEntryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +30,12 @@ import java.util.stream.Collectors;
 public class LeaderboardService {
     private final LeaderboardRepository leaderboardRepository;
     private final ScoreArchiveRepository scoreArchiveRepository;
+    private final ScoreEntryRepository scoreEntryRepository;
 
-    public LeaderboardService(LeaderboardRepository leaderboardRepository, ScoreArchiveRepository scoreArchiveRepository) {
+    public LeaderboardService(LeaderboardRepository leaderboardRepository, ScoreArchiveRepository scoreArchiveRepository, ScoreEntryRepository scoreEntryRepository) {
         this.leaderboardRepository = leaderboardRepository;
         this.scoreArchiveRepository = scoreArchiveRepository;
+        this.scoreEntryRepository = scoreEntryRepository;
     }
 
     public Leaderboard createNewLeaderboard(LeaderboardCreateRequest request) {
@@ -45,7 +48,7 @@ public class LeaderboardService {
                 .displayName(request.displayName())
                 .sortOrder(request.sortOrder())
                 .allowMultipleScores(request.allowMultipleScores())
-                .isCumulative(request.isCumulative())
+                .cumulative(request.isCumulative())
                 .minScore(request.minScore())
                 .maxScore(request.maxScore())
                 .resetFrequency(request.resetFrequency())
@@ -90,7 +93,10 @@ public class LeaderboardService {
             archiveScores(board, resetLabel);
         }
 
-        board.getEntries().clear();
+        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(board.getSlug(), Pageable.unpaged()).getContent();
+        if (!entries.isEmpty()) {
+            scoreEntryRepository.deleteAllInBatch(entries);
+        }
 
         if (board.getResetFrequency() != ResetFrequency.NONE) {
             calculateNextReset(board);
@@ -113,7 +119,9 @@ public class LeaderboardService {
 
     private void archiveScores(Leaderboard board, String resetLabel) {
         LocalDateTime now = LocalDateTime.now();
-        List<ScoreArchive> archives = board.getEntries().stream()
+        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(board.getSlug(), Pageable.unpaged()).getContent();
+
+        List<ScoreArchive> archives = entries.stream()
                 .map(entry -> mapToArchive(entry, resetLabel, now))
                 .collect(Collectors.toList());
         scoreArchiveRepository.saveAll(archives);
