@@ -9,21 +9,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/admin")
 @Tag(name = "Admin — API Keys", description = "API key rotation")
-public class AdminApiKeyController {
+public class AdminSettingsController {
 
     private final SystemSettingService systemSettingService;
 
-    public AdminApiKeyController(SystemSettingService systemSettingService) {
+    public AdminSettingsController(SystemSettingService systemSettingService) {
         this.systemSettingService = systemSettingService;
     }
 
@@ -49,6 +47,38 @@ public class AdminApiKeyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of(
                             "error", "Failed to rotate game key",
+                            "message", e.getMessage()
+                    ));
+        }
+    }
+
+    @GetMapping("/settings")
+    @Operation(summary = "Get all settings", description = "Retrieves all system settings from database.")
+    @ApiResponse(responseCode = "200", description = "Settings retrieved successfully", content = @Content(schema = @Schema(example = "{\"WEBHOOK_URL\": \"https://example.com/webhook\", \"WEBHOOK_TOP_N\": \"10\", \"WEBHOOK_COOLDOWN_MS\": \"60000\"}")))
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(example = "{\"error\": \"Failed to retrieve settings\", \"message\": \"Database connection failed\"}")))
+    public ResponseEntity<Map<String, String>> getAllSettings() {
+        try {
+            List<String> settingKeys = List.of(
+                    "GAME_SECRET",
+                    "WEBHOOK_URL",
+                    "WEBHOOK_TOP_N",
+                    "WEBHOOK_COOLDOWN_MS",
+                    "WEBHOOK_LAST_FIRED"
+            );
+
+            Map<String, String> settings = settingKeys.stream()
+                    .collect(java.util.stream.Collectors.toMap(
+                            key -> key,
+                            key -> {
+                                return systemSettingService.getSetting(key, "");
+                            }
+                    ));
+
+            return ResponseEntity.ok(settings);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "error", "Failed to retrieve settings",
                             "message", e.getMessage()
                     ));
         }
