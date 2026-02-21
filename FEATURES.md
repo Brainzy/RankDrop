@@ -20,9 +20,9 @@ Current status of all features. ✅ = Implemented
 
 ### Performance Optimizations
 
-- [ ] In-memory cache for top 100 per leaderboard
+- [✅] In-memory cache for top 100 per leaderboard
+- [✅] Smart cache invalidation on relevant writes
 - [ ] Sub-10ms cached read response times
-- [ ] Smart cache invalidation on relevant writes
 - [ ] Batch database writes to reduce load
 - [ ] Connection pooling for database efficiency
 - [ ] Graceful degradation (serve cached data if DB down)

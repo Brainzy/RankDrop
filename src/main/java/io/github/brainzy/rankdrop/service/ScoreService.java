@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class ScoreService {
 
     private final ScoreEntryRepository scoreRepository;
     private final LeaderboardRepository leaderboardRepository;
+    private final ScoreCacheService scoreCacheService;
 
     @Transactional
     public ScoreSubmitResponse submitScore(String slug, String playerName, double value, String metadata) {
@@ -36,15 +38,27 @@ public class ScoreService {
 
         validateScore(value, leaderboard);
 
+        ScoreSubmitResponse response;
         if (leaderboard.isCumulative()) {
-            return handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
+            response = handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
+        } else if (!leaderboard.isAllowMultipleScores()) {
+            response = handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
+        } else {
+            response = createAndSaveScore(leaderboard, playerName, value, metadata);
         }
 
-        if (!leaderboard.isAllowMultipleScores()) {
-            return handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
+        long betterScoresCount;
+        if (leaderboard.getSortOrder() == SortOrder.ASC) {
+            betterScoresCount = scoreRepository.countBetterScoresAsc(slug, response.scoreValue(), response.submittedAt());
+        } else {
+            betterScoresCount = scoreRepository.countBetterScoresDesc(slug, response.scoreValue(), response.submittedAt());
         }
 
-        return createAndSaveScore(leaderboard, playerName, value, metadata);
+        if (betterScoresCount < 100) {
+            scoreCacheService.evictTopScoresCache(slug);
+        }
+
+        return response;
     }
 
     private void validateScore(double value, Leaderboard leaderboard) {
@@ -107,20 +121,8 @@ public class ScoreService {
     }
 
     public List<ScoreEntryResponse> getTopScores(String slug, int limit) {
-        Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
-                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
-
-        Sort.Direction direction = resolveSortDirection(leaderboard.getSortOrder());
-        Pageable pageable = PageRequest.of(0, limit, Sort.by(direction, "scoreValue"));
-
-        List<ScoreEntry> entries = scoreRepository.findByLeaderboard_Slug(slug, pageable).getContent();
-
-        List<ScoreEntryResponse> response = new ArrayList<>();
-        for (int i = 0; i < entries.size(); i++) {
-            response.add(ScoreEntryResponse.fromEntity(entries.get(i), i + 1));
-        }
-
-        return response;
+        List<ScoreEntryResponse> top100 = scoreCacheService.getTop100(slug);
+        return top100.stream().limit(limit).collect(Collectors.toList());
     }
 
     public List<ScoreEntryResponse> getPlayerScoreWithSurrounding(String slug, String playerAlias, int surrounding) {
