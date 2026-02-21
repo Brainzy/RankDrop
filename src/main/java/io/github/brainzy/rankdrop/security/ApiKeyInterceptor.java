@@ -37,7 +37,7 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
             log.error("CRITICAL: ADMIN_SECRET is not set! Admin endpoints will be inaccessible.");
         }
 
-        String dbKey = systemSettingService.getGameKey();
+        String dbKey = systemSettingService.getSetting("GAME_SECRET");
         boolean hasEnvKey = gameSecret != null && !gameSecret.isBlank();
         boolean hasDbKey = dbKey != null && !dbKey.isBlank();
 
@@ -68,7 +68,7 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String dbKey = systemSettingService.getGameKey();
+        String dbKey = systemSettingService.getSetting("GAME_SECRET");
         if (dbKey != null && MessageDigest.isEqual(
                 dbKey.getBytes(StandardCharsets.UTF_8),
                 providedKey.getBytes(StandardCharsets.UTF_8))) {

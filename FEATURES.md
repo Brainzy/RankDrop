@@ -61,7 +61,6 @@ Current status of all features. ✅ = Implemented
 - [✅] Ban players globally (all leaderboards)
 - [✅] Player ban enforcement on score submission
 - [✅] Remove individual scores
-- [ ] View audit log of admin actions
 
 ---
 
@@ -76,11 +75,7 @@ Current status of all features. ✅ = Implemented
 
 ### Rate Limiting
 
-- [ ] Per-leaderboard rate limiting (configurable)
-
-### Anti-Cheat
-
-- [ ] Suspicious score logging
+- [ ] Rate limiting via Caddy
 
 ---
 
