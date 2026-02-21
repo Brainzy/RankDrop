@@ -72,7 +72,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Admin token authentication (server management)
 - [✅] Per-game API key authentication
 - [✅] Separate auth scopes for admin vs game operations
-- [ ] API key rotation support
+- [✅] API key rotation support
 
 ### Rate Limiting
 

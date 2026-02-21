@@ -1,6 +1,7 @@
 package io.github.brainzy.rankdrop.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.brainzy.rankdrop.service.SystemSettingService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
@@ -20,21 +22,27 @@ import java.util.Map;
 @Slf4j
 public class ApiKeyInterceptor implements HandlerInterceptor {
 
+    private final SystemSettingService systemSettingService;
+    private final ObjectMapper objectMapper;
+
     @Value("${ADMIN_SECRET:}")
     private String adminSecret;
 
     @Value("${GAME_SECRET:}")
     private String gameSecret;
 
-    private final ObjectMapper objectMapper;
-
     @PostConstruct
     public void init() {
         if (adminSecret == null || adminSecret.isBlank()) {
             log.error("CRITICAL: ADMIN_SECRET is not set! Admin endpoints will be inaccessible.");
         }
-        if (gameSecret == null || gameSecret.isBlank()) {
-            log.warn("WARNING: GAME_SECRET is not set! Score submission will be inaccessible.");
+
+        String dbKey = systemSettingService.getGameKey();
+        boolean hasEnvKey = gameSecret != null && !gameSecret.isBlank();
+        boolean hasDbKey = dbKey != null && !dbKey.isBlank();
+
+        if (!hasEnvKey && !hasDbKey) {
+            log.warn("WARNING: No GAME_SECRET configured. Score submission will be inaccessible.");
         }
     }
 
@@ -43,34 +51,44 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
         String path = request.getRequestURI();
         String method = request.getMethod();
 
-        // 1. Admin Endpoints
         if (path.startsWith("/api/v1/admin")) {
             return validateHeader(response, request.getHeader("X-Admin-Token"), adminSecret);
         }
 
-        // 2. Game Endpoints (Score Submission)
         if (path.matches("^/api/v1/leaderboards/[^/]+/scores$") && "POST".equalsIgnoreCase(method)) {
-            return validateHeader(response, request.getHeader("X-Game-Key"), gameSecret);
+            return validateApiKey(response, request.getHeader("X-Game-Key"));
         }
 
-        // 3. Public Endpoints (GET /top, GET /players/...)
         return true;
     }
 
+    private boolean validateApiKey(HttpServletResponse response, String providedKey) throws IOException {
+        if (providedKey == null || providedKey.isBlank()) {
+            sendJsonError(response, "Missing API Key.");
+            return false;
+        }
+
+        String dbKey = systemSettingService.getGameKey();
+        if (dbKey != null && MessageDigest.isEqual(
+                dbKey.getBytes(StandardCharsets.UTF_8),
+                providedKey.getBytes(StandardCharsets.UTF_8))) {
+            return true;
+        }
+
+        return validateHeader(response, providedKey, gameSecret);
+    }
+
     private boolean validateHeader(HttpServletResponse response, String provided, String expected) throws IOException {
-        // Fail secure: If server secret is missing, deny everything.
         if (expected == null || expected.isBlank()) {
             sendJsonError(response, "Server misconfiguration: API secret not set.");
             return false;
         }
 
-        // Fail secure: If client didn't provide a key.
         if (provided == null || provided.isBlank()) {
             sendJsonError(response, "Missing API Key.");
             return false;
         }
 
-        // Constant-time comparison to prevent timing attacks
         if (!MessageDigest.isEqual(
                 expected.getBytes(StandardCharsets.UTF_8),
                 provided.getBytes(StandardCharsets.UTF_8))) {
@@ -82,12 +100,12 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
     }
 
     private void sendJsonError(HttpServletResponse response, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
         String json = objectMapper.writeValueAsString(Map.of(
-                "timestamp", java.time.LocalDateTime.now().toString(),
+                "timestamp", LocalDateTime.now().toString(),
                 "status", 401,
                 "error", "Unauthorized",
                 "message", message
