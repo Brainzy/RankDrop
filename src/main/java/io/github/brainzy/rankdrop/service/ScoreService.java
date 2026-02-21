@@ -187,11 +187,29 @@ public class ScoreService {
         return result;
     }
 
+    @Transactional(readOnly = true)
+    public List<ScoreEntryResponse> getAllScoresForLeaderboard(String slug) {
+        Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
+                .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+
+        Sort.Direction direction = resolveSortDirection(leaderboard.getSortOrder());
+
+        Sort sort = Sort.by(direction, "scoreValue").and(Sort.by(Sort.Direction.ASC, "submittedAt"));
+
+        List<ScoreEntry> allScores = scoreRepository.findByLeaderboard_Slug(slug, sort);
+
+        List<ScoreEntryResponse> result = new ArrayList<>();
+        for (int i = 0; i < allScores.size(); i++) {
+            result.add(ScoreEntryResponse.fromEntity(allScores.get(i), i + 1));
+        }
+        return result;
+    }
+
     @Transactional
     public void removeScore(Long scoreId) {
         ScoreEntry scoreEntry = scoreRepository.findById(scoreId)
                 .orElseThrow(() -> new IllegalArgumentException("Score entry not found with ID: " + scoreId));
-        
+
         String leaderboardSlug = scoreEntry.getLeaderboard().getSlug();
         scoreRepository.delete(scoreEntry);
         scoreCacheService.evictTopScoresCache(leaderboardSlug);

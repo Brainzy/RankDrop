@@ -39,12 +39,7 @@ public class OpenApiConfig {
                                 .name("X-Game-Key")
                                 .type(SecurityScheme.Type.APIKEY)
                                 .in(SecurityScheme.In.HEADER)
-                                .description("Required for POST /scores endpoints")));
-    }
-
-    @Bean
-    public OpenAPI openAPI() {
-        return new OpenAPI()
+                                .description("Required for POST /scores endpoints")))
                 .tags(List.of(
                         new Tag().name("Client — API").description("Score submission and leaderboard reads"),
                         new Tag().name("Admin — Leaderboards").description("Leaderboard management"),

@@ -12,10 +12,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
+    List<ScoreEntry> findByLeaderboard_Slug(String slug, Sort sort);
+
     void deleteByLeaderboard(Leaderboard leaderboard);
 
     Page<ScoreEntry> findByLeaderboard_Slug(String slug, Pageable pageable);

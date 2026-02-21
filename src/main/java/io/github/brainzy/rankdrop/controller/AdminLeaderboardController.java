@@ -3,6 +3,7 @@ package io.github.brainzy.rankdrop.controller;
 import io.github.brainzy.rankdrop.dto.LeaderboardCreateRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardResetRequest;
 import io.github.brainzy.rankdrop.dto.LeaderboardUpdateRequest;
+import io.github.brainzy.rankdrop.dto.ScoreEntryResponse;
 import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.service.LeaderboardService;
 import io.github.brainzy.rankdrop.service.ScoreService;
@@ -85,5 +86,13 @@ public class AdminLeaderboardController {
     public ResponseEntity<Void> removeScore(@PathVariable Long scoreId) {
         scoreService.removeScore(scoreId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/leaderboards/{slug}/scores")
+    @Operation(summary = "List all scores for leaderboard", description = "Returns all score entries for a specific leaderboard with their ranks.")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved all scores")
+    @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
+    public List<ScoreEntryResponse> getAllScoresForLeaderboard(@PathVariable String slug) {
+        return scoreService.getAllScoresForLeaderboard(slug);
     }
 }

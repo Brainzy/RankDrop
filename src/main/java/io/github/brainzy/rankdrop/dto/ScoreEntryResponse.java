@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 
 @Schema(description = "Response object representing a score entry with rank")
 public record ScoreEntryResponse(
+        @Schema(description = "Internal ID of the score entry", example = "101")
+        Long id,
+
         @Schema(description = "The player's display name", example = "PlayerOne")
         String playerAlias,
 
@@ -24,6 +27,7 @@ public record ScoreEntryResponse(
 ) {
     public static ScoreEntryResponse fromEntity(ScoreEntry entry, long rank) {
         return new ScoreEntryResponse(
+                entry.getId(),
                 entry.getPlayerAlias(),
                 entry.getScoreValue(),
                 rank,
