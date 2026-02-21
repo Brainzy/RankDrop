@@ -18,7 +18,8 @@ public record ScoreSubmissionRequest(
         @NotNull(message = "Score is required")
         Double scoreValue,
 
-        @Schema(description = "Optional metadata string associated with the score", example = "Level 5 - Warrior")
+        @Schema(description = "Optional metadata string associated with the score (Max 1000 chars)", example = "Level 5 - Warrior")
+        @Size(max = 1000, message = "Metadata must not exceed 1000 characters")
         String metadata
 ) {
 }
