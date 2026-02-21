@@ -204,16 +204,6 @@ Current status of all features. ✅ = Implemented
 - [ ] Database migration testing (10M records)
 - [ ] Endurance testing (24hr+ continuous load)
 
-### Optimization
-
-- [ ] Query optimization for common patterns
-- [ ] Index tuning for leaderboard queries
-- [ ] Memory usage optimization
-- [ ] Startup time optimization
-- [ ] Docker image size optimization
-
----
-
 ## Version History
 
 ### v1.0.0 (Target: Q2 2026)
