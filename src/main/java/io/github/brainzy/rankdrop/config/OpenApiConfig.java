@@ -45,7 +45,7 @@ public class OpenApiConfig {
                         new Tag().name("Admin — Leaderboards").description("Leaderboard management"),
                         new Tag().name("Admin — Archive").description("Archive history"),
                         new Tag().name("Admin — Players").description("Player ban management"),
-                        new Tag().name("Admin — API Keys").description("API key rotation")
+                        new Tag().name("Admin — Settings").description("Config for game key and webhook")
                 ));
     }
 }
