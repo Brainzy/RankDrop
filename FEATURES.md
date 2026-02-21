@@ -181,8 +181,8 @@ Current status of all features. ✅ = Implemented
 - [✅] One-click "Authorize" in Swagger UI
 - [✅] Try-it-out functionality for all endpoints
 - [✅] Request/response schema definitions
-- [ ] Comprehensive README
-- [ ] Quick start guide
+- [✅] Comprehensive README
+- [✅] Quick start guide
 - [ ] Troubleshooting guide
 
 ---
