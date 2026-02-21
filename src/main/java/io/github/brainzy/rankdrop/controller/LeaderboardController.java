@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/leaderboards")
-@Tag(name = "Client API", description = "Public client API")
+@Tag(name = "Client — API", description = "Score submission and leaderboard reads")
 @Validated
 @RequiredArgsConstructor
 public class LeaderboardController {

@@ -6,8 +6,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.tags.Tag;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.List;
 
 @Configuration
 public class OpenApiConfig {
@@ -37,5 +40,16 @@ public class OpenApiConfig {
                                 .type(SecurityScheme.Type.APIKEY)
                                 .in(SecurityScheme.In.HEADER)
                                 .description("Required for POST /scores endpoints")));
+    }
+
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .tags(List.of(
+                        new Tag().name("Client — API").description("Score submission and leaderboard reads"),
+                        new Tag().name("Admin — Leaderboards").description("Leaderboard management"),
+                        new Tag().name("Admin — Archive").description("Archive history"),
+                        new Tag().name("Admin — Players").description("Player ban management")
+                ));
     }
 }
