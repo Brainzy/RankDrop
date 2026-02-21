@@ -26,7 +26,7 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
     @Value("${GAME_SECRET:}")
     private String gameSecret;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
     @PostConstruct
     public void init() {
@@ -58,16 +58,19 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
     }
 
     private boolean validateHeader(HttpServletResponse response, String provided, String expected) throws IOException {
+        // Fail secure: If server secret is missing, deny everything.
         if (expected == null || expected.isBlank()) {
             sendJsonError(response, "Server misconfiguration: API secret not set.");
             return false;
         }
 
+        // Fail secure: If client didn't provide a key.
         if (provided == null || provided.isBlank()) {
             sendJsonError(response, "Missing API Key.");
             return false;
         }
 
+        // Constant-time comparison to prevent timing attacks
         if (!MessageDigest.isEqual(
                 expected.getBytes(StandardCharsets.UTF_8),
                 provided.getBytes(StandardCharsets.UTF_8))) {
