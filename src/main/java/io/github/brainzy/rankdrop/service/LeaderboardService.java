@@ -71,6 +71,7 @@ public class LeaderboardService {
     public void deleteLeaderboardBySlug(String slug) {
         Leaderboard board = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
+        scoreEntryRepository.deleteByLeaderboard(board);
         leaderboardRepository.delete(board);
     }
 

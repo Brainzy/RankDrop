@@ -1,5 +1,6 @@
 package io.github.brainzy.rankdrop.repository;
 
+import io.github.brainzy.rankdrop.entity.Leaderboard;
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 @Repository
 public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
+    void deleteByLeaderboard(Leaderboard leaderboard);
+
     Page<ScoreEntry> findByLeaderboard_Slug(String slug, Pageable pageable);
 
     Optional<ScoreEntry> findTopByLeaderboard_SlugAndPlayerAlias(String slug, String playerAlias, Sort sort);
