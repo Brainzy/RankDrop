@@ -1,0 +1,20 @@
+services:
+  rankdrop:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMIN_SECRET=${ADMIN_SECRET}
+      - GAME_SECRET=${GAME_SECRET}
+      - DB_USERNAME=${DB_USERNAME:-rankdrop}
+      - DB_PASSWORD=${DB_PASSWORD:-}
+    volumes:
+      - ./data:/app/data
+      - ./backups:/app/backups
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
