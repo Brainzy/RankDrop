@@ -33,13 +33,13 @@ public class Leaderboard {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "sort_order", nullable = false)
-    @Schema(description = "Sorting order for the leaderboard", example = "DESC")
+    @Schema(description = "Sorting order for the leaderboard. Options: DESC, ASC", example = "DESC")
     private SortOrder sortOrder = SortOrder.DESC;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "score_strategy", nullable = false)
-    @Schema(description = "Strategy for handling score submissions", example = "BEST_ONLY")
+    @Schema(description = "Strategy for handling score submissions. Options: BEST_ONLY, MULTIPLE_ENTRIES, CUMULATIVE", example = "BEST_ONLY")
     private ScoreStrategy scoreStrategy = ScoreStrategy.BEST_ONLY;
 
     @Builder.Default
@@ -55,7 +55,7 @@ public class Leaderboard {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "reset_frequency", nullable = false)
-    @Schema(description = "Frequency of automatic resets", example = "NONE")
+    @Schema(description = "Frequency of automatic resets. Options: NONE, DAILY, WEEKLY, MONTHLY", example = "NONE")
     private ResetFrequency resetFrequency = ResetFrequency.NONE;
 
     @Builder.Default

@@ -34,7 +34,11 @@ public class AdminLeaderboardController {
     }
 
     @PostMapping("/leaderboards")
-    @Operation(summary = "Create a new leaderboard", description = "Initializes a leaderboard with a unique slug and sorting rules.")
+    @Operation(summary = "Create a new leaderboard", description = """
+            Creates a new leaderboard.\
+                    **scoreStrategy options:** BEST_ONLY, MULTIPLE_ENTRIES, CUMULATIVE
+                    **sortOrder options:** ASC, DESC
+                    **resetFrequency options:** NONE, DAILY, WEEKLY, MONTHLY""")
     @ApiResponse(responseCode = "201", description = "Leaderboard created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
     @ApiResponse(responseCode = "409", description = "Leaderboard with this slug already exists", content = @Content(schema = @Schema(hidden = true)))
