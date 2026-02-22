@@ -102,12 +102,16 @@ public class AdminLeaderboardController {
     }
 
     @GetMapping("/leaderboards/{slug}/scores")
-    @Operation(summary = "List all scores for leaderboard", description = "Returns all score entries for a specific leaderboard with their ranks.")
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved all scores")
+    @Operation(summary = "List all scores for leaderboard", description = "Returns paginated score entries for a specific leaderboard with their ranks. Maximum 1000 per page.")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntryResponse> getAllScoresForLeaderboard(
+    public ResponseEntity<List<ScoreEntryResponse>> getAllScoresForLeaderboard(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
-            @PathVariable String slug) {
-        return scoreService.getAllScoresForLeaderboard(slug);
+            @PathVariable String slug,
+            @Parameter(description = "Page number, zero-based", example = "0")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Page size, max 1000", example = "500")
+            @RequestParam(defaultValue = "500") int size) {
+        return ResponseEntity.ok(scoreService.getAllScoresForLeaderboard(slug, page, size));
     }
 }

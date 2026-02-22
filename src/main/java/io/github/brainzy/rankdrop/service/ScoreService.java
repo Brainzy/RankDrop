@@ -11,6 +11,7 @@ import io.github.brainzy.rankdrop.exception.PlayerNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreEntryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -78,42 +79,38 @@ public class ScoreService {
     }
 
     private ScoreSubmitResponse handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
-        Optional<ScoreEntry> existingOpt = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
-                leaderboard.getSlug(), playerName, Sort.unsorted());
+        int rowsUpdated = scoreRepository.incrementScore(
+                leaderboard.getSlug(), playerName, value, LocalDateTime.now(ZoneOffset.UTC));
 
-        if (existingOpt.isEmpty()) {
+        if (rowsUpdated == 0) {
             return createAndSaveScore(leaderboard, playerName, value, metadata);
         }
 
-        ScoreEntry existing = existingOpt.get();
-        existing.setScoreValue(existing.getScoreValue() + value);
-        existing.setSubmittedAt(LocalDateTime.now(ZoneOffset.UTC));
-        if (metadata != null) {
-            existing.setMetadata(metadata);
-        }
-
-        return ScoreSubmitResponse.fromEntity(scoreRepository.save(existing));
+        return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
+                        leaderboard.getSlug(), playerName, Sort.unsorted())
+                .map(ScoreSubmitResponse::fromEntity)
+                .orElseThrow(() -> new IllegalStateException("Score not found after increment for player: " + playerName));
     }
 
     private ScoreSubmitResponse handleSingleScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
-        Optional<ScoreEntry> existingOpt = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
-                leaderboard.getSlug(), playerName, Sort.unsorted());
+        LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
-        if (existingOpt.isEmpty()) {
-            return createAndSaveScore(leaderboard, playerName, value, metadata);
+        int rowsUpdated = leaderboard.getSortOrder() == SortOrder.ASC
+                ? scoreRepository.updateIfLowerScore(leaderboard.getSlug(), playerName, value, now)
+                : scoreRepository.updateIfHigherScore(leaderboard.getSlug(), playerName, value, now);
+
+        if (rowsUpdated == 0) {
+            Optional<ScoreEntry> existing = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
+                    leaderboard.getSlug(), playerName, Sort.unsorted());
+
+            return existing.map(ScoreSubmitResponse::fromEntity).orElseGet(() -> createAndSaveScore(leaderboard, playerName, value, metadata));
+
         }
 
-        ScoreEntry existing = existingOpt.get();
-        if (isNewScoreBetter(value, existing.getScoreValue(), leaderboard.getSortOrder())) {
-            existing.setScoreValue(value);
-            existing.setSubmittedAt(LocalDateTime.now(ZoneOffset.UTC));
-            if (metadata != null) {
-                existing.setMetadata(metadata);
-            }
-            return ScoreSubmitResponse.fromEntity(scoreRepository.save(existing));
-        }
-
-        return ScoreSubmitResponse.fromEntity(existing);
+        return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
+                        leaderboard.getSlug(), playerName, Sort.unsorted())
+                .map(ScoreSubmitResponse::fromEntity)
+                .orElseThrow();
     }
 
     private ScoreSubmitResponse createAndSaveScore(Leaderboard leaderboard, String playerName, double value, String metadata) {
@@ -189,19 +186,22 @@ public class ScoreService {
     }
 
     @Transactional(readOnly = true)
-    public List<ScoreEntryResponse> getAllScoresForLeaderboard(String slug) {
+    public List<ScoreEntryResponse> getAllScoresForLeaderboard(String slug, int page, int size) {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
         Sort.Direction direction = resolveSortDirection(leaderboard.getSortOrder());
-
         Sort sort = Sort.by(direction, "scoreValue").and(Sort.by(Sort.Direction.ASC, "submittedAt"));
 
-        List<ScoreEntry> allScores = scoreRepository.findByLeaderboard_Slug(slug, sort);
+        int safSize = Math.min(size, 1000);
+        Pageable pageable = PageRequest.of(page, safSize, sort);
 
+        Page<ScoreEntry> scorePage = scoreRepository.findByLeaderboard_Slug(slug, pageable);
+
+        long pageOffset = (long) page * safSize;
         List<ScoreEntryResponse> result = new ArrayList<>();
-        for (int i = 0; i < allScores.size(); i++) {
-            result.add(ScoreEntryResponse.fromEntity(allScores.get(i), i + 1));
+        for (int i = 0; i < scorePage.getContent().size(); i++) {
+            result.add(ScoreEntryResponse.fromEntity(scorePage.getContent().get(i), pageOffset + i + 1));
         }
         return result;
     }
@@ -218,9 +218,5 @@ public class ScoreService {
 
     private Sort.Direction resolveSortDirection(SortOrder sortOrder) {
         return (sortOrder == SortOrder.ASC) ? Sort.Direction.ASC : Sort.Direction.DESC;
-    }
-
-    private boolean isNewScoreBetter(double newScore, double currentScore, SortOrder sortOrder) {
-        return (sortOrder == SortOrder.ASC) ? newScore < currentScore : newScore > currentScore;
     }
 }

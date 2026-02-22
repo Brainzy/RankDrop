@@ -7,21 +7,33 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
-    List<ScoreEntry> findByLeaderboard_Slug(String slug, Sort sort);
-
     void deleteByLeaderboard(Leaderboard leaderboard);
 
     Page<ScoreEntry> findByLeaderboard_Slug(String slug, Pageable pageable);
+
+    @Modifying
+    @Query("UPDATE ScoreEntry s SET s.scoreValue = s.scoreValue + :value, s.submittedAt = :now WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias")
+    int incrementScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
+
+    @Modifying
+    @Query("UPDATE ScoreEntry s SET s.scoreValue = :value, s.submittedAt = :now " +
+            "WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias AND s.scoreValue < :value")
+    int updateIfHigherScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
+
+    @Modifying
+    @Query("UPDATE ScoreEntry s SET s.scoreValue = :value, s.submittedAt = :now " +
+            "WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias AND s.scoreValue > :value")
+    int updateIfLowerScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
 
     Optional<ScoreEntry> findTopByLeaderboard_SlugAndPlayerAlias(String slug, String playerAlias, Sort sort);
 
