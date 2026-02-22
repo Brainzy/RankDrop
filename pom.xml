@@ -6,13 +6,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.2</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
     <groupId>io.github.brainzy</groupId>
     <artifactId>RankDrop</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>rankdrop</name>
-    <description>Demo project for Spring Boot</description>
+    <description>Self-hosted leaderboard backend</description>
     <url/>
     <licenses>
         <license/>
@@ -30,11 +30,12 @@
         <java.version>25</java.version>
         <assertj.version>3.27.7</assertj.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.8.0</version>
+            <version>3.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,7 +53,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-docker-compose</artifactId>
@@ -123,7 +123,60 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>io.github.brainzy.rankdrop.RankDropApplication</mainClass>
+                    <imageName>rankdrop</imageName>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>native</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.graalvm.buildtools</groupId>
+                        <artifactId>native-maven-plugin</artifactId>
+                        <configuration>
+                            <mainClass>io.github.brainzy.rankdrop.RankDropApplication</mainClass>
+                            <imageName>rankdrop</imageName>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <builder>paketobuildpacks/builder:tiny</builder>
+                                <env>
+                                    <BP_NATIVE_IMAGE>true</BP_NATIVE_IMAGE>
+                                </env>
+                            </image>
+                            <excludes>
+                                <exclude>
+                                    <groupId>org.projectlombok</groupId>
+                                    <artifactId>lombok</artifactId>
+                                </exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
