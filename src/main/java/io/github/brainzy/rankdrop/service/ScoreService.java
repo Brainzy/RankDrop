@@ -46,14 +46,11 @@ public class ScoreService {
 
         validateScore(value, leaderboard);
 
-        ScoreSubmitResponse response;
-        if (leaderboard.isCumulative()) {
-            response = handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
-        } else if (!leaderboard.isAllowMultipleScores()) {
-            response = handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
-        } else {
-            response = createAndSaveScore(leaderboard, playerName, value, metadata);
-        }
+        ScoreSubmitResponse response = switch (leaderboard.getScoreStrategy()) {
+            case CUMULATIVE -> handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
+            case BEST_ONLY -> handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
+            case MULTIPLE_ENTRIES -> createAndSaveScore(leaderboard, playerName, value, metadata);
+        };
 
         long betterScoresCount;
         if (leaderboard.getSortOrder() == SortOrder.ASC) {

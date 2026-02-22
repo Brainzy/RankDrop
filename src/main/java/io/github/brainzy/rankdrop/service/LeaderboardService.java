@@ -20,8 +20,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,8 +48,7 @@ public class LeaderboardService {
                 .slug(request.slug())
                 .displayName(request.displayName())
                 .sortOrder(request.sortOrder())
-                .allowMultipleScores(request.allowMultipleScores())
-                .cumulative(request.isCumulative())
+                .scoreStrategy(request.scoreStrategy())
                 .minScore(request.minScore())
                 .maxScore(request.maxScore())
                 .resetFrequency(request.resetFrequency())

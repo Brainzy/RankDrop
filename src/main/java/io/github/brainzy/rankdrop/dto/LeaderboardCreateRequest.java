@@ -1,6 +1,7 @@
 package io.github.brainzy.rankdrop.dto;
 
 import io.github.brainzy.rankdrop.entity.ResetFrequency;
+import io.github.brainzy.rankdrop.entity.ScoreStrategy;
 import io.github.brainzy.rankdrop.entity.SortOrder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -12,8 +13,7 @@ import jakarta.validation.constraints.Size;
           "slug": "global-speedrun-v1",
           "displayName": "Global Speedrun Rankings",
           "sortOrder": "ASC",
-          "allowMultipleScores": false,
-          "isCumulative": false,
+          "scoreStrategy": "BEST_ONLY",
           "minScore": 0,
           "maxScore": 1000000,
           "resetFrequency": "NONE",
@@ -51,20 +51,13 @@ public record LeaderboardCreateRequest(
         SortOrder sortOrder,
 
         @Schema(
-                description = "If true, a player can have multiple entries. If false (default), only their best score is kept.",
-                example = "false",
-                defaultValue = "false",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED
+                description = "Strategy for handling score submissions. BEST_ONLY (default) keeps only the best score per player. MULTIPLE_ENTRIES stores every submission. CUMULATIVE sums all submissions of same player.",
+                example = "BEST_ONLY",
+                defaultValue = "BEST_ONLY",
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+                allowableValues = {"BEST_ONLY", "MULTIPLE_ENTRIES", "CUMULATIVE"}
         )
-        Boolean allowMultipleScores,
-
-        @Schema(
-                description = "If true, new scores are added to the player's existing total. If false (default), only the best score is kept.",
-                example = "false",
-                defaultValue = "false",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED
-        )
-        Boolean isCumulative,
+        ScoreStrategy scoreStrategy,
 
         @Schema(description = "Optional minimum score value allowed for submission", example = "0", defaultValue = "0")
         Double minScore,
@@ -90,8 +83,7 @@ public record LeaderboardCreateRequest(
 ) {
     public LeaderboardCreateRequest {
         sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
-        allowMultipleScores = (allowMultipleScores != null) && allowMultipleScores;
-        isCumulative = (isCumulative != null) && isCumulative;
+        scoreStrategy = (scoreStrategy == null) ? ScoreStrategy.BEST_ONLY : scoreStrategy;
         minScore = (minScore == null) ? 0.0 : minScore;
         maxScore = (maxScore == null) ? 1000000.0 : maxScore;
         resetFrequency = (resetFrequency == null) ? ResetFrequency.NONE : resetFrequency;
