@@ -3,6 +3,7 @@ package io.github.brainzy.rankdrop.controller;
 import io.github.brainzy.rankdrop.dto.ScoreEntryResponse;
 import io.github.brainzy.rankdrop.dto.ScoreSubmissionRequest;
 import io.github.brainzy.rankdrop.dto.ScoreSubmitResponse;
+import io.github.brainzy.rankdrop.dto.TopScoresListResponse;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +34,7 @@ public class LeaderboardController {
     )
     @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores")
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntryResponse> getTopScores(
+    public TopScoresListResponse getTopScores(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
@@ -44,7 +45,8 @@ public class LeaderboardController {
             )
             @RequestParam(defaultValue = "10") int limit
     ) {
-        return scoreService.getTopScores(slug, limit);
+        List<ScoreEntryResponse> scores = scoreService.getTopScores(slug, limit);
+        return TopScoresListResponse.fromScoreEntryResponses(scores);
     }
 
     @PostMapping("/{slug}/scores")
