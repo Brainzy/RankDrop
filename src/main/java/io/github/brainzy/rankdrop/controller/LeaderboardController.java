@@ -4,6 +4,7 @@ import io.github.brainzy.rankdrop.dto.ScoreEntryResponse;
 import io.github.brainzy.rankdrop.dto.ScoreSubmissionRequest;
 import io.github.brainzy.rankdrop.dto.ScoreSubmitResponse;
 import io.github.brainzy.rankdrop.dto.TopScoresListResponse;
+import io.github.brainzy.rankdrop.dto.PlayerScoreResponse;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -67,11 +68,12 @@ public class LeaderboardController {
     @GetMapping("/{slug}/players/{playerAlias}")
     @Operation(
             summary = "Get player rank and surrounding scores",
-            description = "Fetch a specific player's score and rank, optionally including surrounding players."
+            description = "Fetch a specific player's score and rank, optionally including surrounding players. Returns minimal data format with start rank and scores array."
     )
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved player score")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved player score", content = @Content(schema = @Schema(implementation = PlayerScoreResponse.class, example = "{\"startRank\": 1, \"scores\": [{\"n\": \"Player1\", \"s\": 9500}, {\"n\": \"Player2\", \"s\": 8200}]}")))
     @ApiResponse(responseCode = "404", description = "Leaderboard or player not found", content = @Content(schema = @Schema(hidden = true)))
-    public List<ScoreEntryResponse> getPlayerScore(
+    @Schema(description = "Get player score with surrounding scores", implementation = PlayerScoreResponse.class)
+    public PlayerScoreResponse getPlayerScore(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug,
 
@@ -85,6 +87,7 @@ public class LeaderboardController {
             )
             @RequestParam(defaultValue = "0") int surrounding
     ) {
-        return scoreService.getPlayerScoreWithSurrounding(slug, playerAlias, surrounding);
+        List<ScoreEntryResponse> scores = scoreService.getPlayerScoreWithSurrounding(slug, playerAlias, surrounding);
+        return PlayerScoreResponse.fromScoreEntryResponses(scores);
     }
 }
