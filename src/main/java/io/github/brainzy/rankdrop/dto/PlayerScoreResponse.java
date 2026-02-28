@@ -10,16 +10,16 @@ public record PlayerScoreResponse(
         long startRank,
 
         @Schema(description = "List of scores with minimal data")
-        List<TopScoreResponse> scores
+        List<TopScoreWithMetadataResponse> scores
 ) {
-    public static PlayerScoreResponse fromScoreEntryResponses(List<ScoreEntryResponse> responses) {
+    public static PlayerScoreResponse fromScoreEntryResponses(List<ScoreEntryResponse> responses, boolean includeMetadata) {
         if (responses.isEmpty()) {
             return new PlayerScoreResponse(0, List.of());
         }
 
         long startRank = responses.get(0).rank();
-        List<TopScoreResponse> scores = responses.stream()
-                .map(TopScoreResponse::fromScoreEntryResponse)
+        List<TopScoreWithMetadataResponse> scores = responses.stream()
+                .map(response -> TopScoreWithMetadataResponse.fromScoreEntryResponse(response, includeMetadata))
                 .toList();
 
         return new PlayerScoreResponse(startRank, scores);

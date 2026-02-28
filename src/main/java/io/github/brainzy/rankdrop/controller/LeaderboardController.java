@@ -1,10 +1,6 @@
 package io.github.brainzy.rankdrop.controller;
 
-import io.github.brainzy.rankdrop.dto.ScoreEntryResponse;
-import io.github.brainzy.rankdrop.dto.ScoreSubmissionRequest;
-import io.github.brainzy.rankdrop.dto.ScoreSubmitResponse;
-import io.github.brainzy.rankdrop.dto.TopScoresListResponse;
-import io.github.brainzy.rankdrop.dto.PlayerScoreResponse;
+import io.github.brainzy.rankdrop.dto.*;
 import io.github.brainzy.rankdrop.service.ScoreService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -85,9 +81,12 @@ public class LeaderboardController {
                     example = "5",
                     schema = @Schema(defaultValue = "0")
             )
-            @RequestParam(defaultValue = "0") int surrounding
+            @RequestParam(defaultValue = "0") int surrounding,
+
+            @Parameter(description = "Include metadata in response", required = false)
+            @RequestParam(value = "includeMetadata", defaultValue = "false") Boolean includeMetadata
     ) {
         List<ScoreEntryResponse> scores = scoreService.getPlayerScoreWithSurrounding(slug, playerAlias, surrounding);
-        return PlayerScoreResponse.fromScoreEntryResponses(scores);
+        return PlayerScoreResponse.fromScoreEntryResponses(scores, includeMetadata != null && includeMetadata);
     }
 }
