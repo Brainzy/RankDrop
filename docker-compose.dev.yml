@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: rankdrop-postgres-dev
+    environment:
+      - POSTGRES_DB=rankdrop
+      - POSTGRES_USER=rankdrop
+      - POSTGRES_PASSWORD=rankdrop
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rankdrop" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

@@ -6,11 +6,15 @@ services:
     environment:
       - ADMIN_SECRET=${ADMIN_SECRET}
       - GAME_SECRET=${GAME_SECRET}
+      - DB_HOST=postgres
+      - DB_NAME=rankdrop
       - DB_USERNAME=${DB_USERNAME:-rankdrop}
-      - DB_PASSWORD=${DB_PASSWORD:-}
+      - DB_PASSWORD=${DB_PASSWORD:-rankdrop}
     volumes:
-      - ./data:/app/data
       - ./backups:/app/backups
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
@@ -18,3 +22,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=rankdrop
+      - POSTGRES_USER=${DB_USERNAME:-rankdrop}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-rankdrop}
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U rankdrop" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
