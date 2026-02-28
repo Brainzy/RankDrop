@@ -55,9 +55,9 @@ public class ScoreService {
 
         long betterScoresCount;
         if (leaderboard.getSortOrder() == SortOrder.ASC) {
-            betterScoresCount = scoreRepository.countBetterScoresAsc(slug, savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresAsc(leaderboard.getId(), savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
         } else {
-            betterScoresCount = scoreRepository.countBetterScoresDesc(slug, savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresDesc(leaderboard.getId(), savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
         }
 
         if (betterScoresCount < 100) {
@@ -80,14 +80,14 @@ public class ScoreService {
 
     private ScoreEntry handleCumulativeScoreSubmissionEntry(Leaderboard leaderboard, String playerName, double value, String metadata) {
         int rowsUpdated = scoreRepository.incrementScore(
-                leaderboard.getSlug(), playerName, value, LocalDateTime.now(ZoneOffset.UTC));
+                leaderboard.getId(), playerName, value, LocalDateTime.now(ZoneOffset.UTC));
 
         if (rowsUpdated == 0) {
             return createAndSaveScoreEntry(leaderboard, playerName, value, metadata);
         }
 
-        return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
-                        leaderboard.getSlug(), playerName, Sort.unsorted())
+        return scoreRepository.findByLeaderboardIdAndPlayerAlias(
+                        leaderboard.getId(), playerName)
                 .orElseThrow(() -> new IllegalStateException("Score not found after increment for player: " + playerName));
     }
 
@@ -95,19 +95,19 @@ public class ScoreService {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         int rowsUpdated = leaderboard.getSortOrder() == SortOrder.ASC
-                ? scoreRepository.updateIfLowerScore(leaderboard.getSlug(), playerName, value, now)
-                : scoreRepository.updateIfHigherScore(leaderboard.getSlug(), playerName, value, now);
+                ? scoreRepository.updateIfLowerScore(leaderboard.getId(), playerName, value, now)
+                : scoreRepository.updateIfHigherScore(leaderboard.getId(), playerName, value, now);
 
         if (rowsUpdated == 0) {
-            Optional<ScoreEntry> existing = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
-                    leaderboard.getSlug(), playerName, Sort.unsorted());
+            Optional<ScoreEntry> existing = scoreRepository.findByLeaderboardIdAndPlayerAlias(
+                    leaderboard.getId(), playerName);
 
             return existing.orElseGet(() -> createAndSaveScoreEntry(leaderboard, playerName, value, metadata));
 
         }
 
-        return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
-                        leaderboard.getSlug(), playerName, Sort.unsorted())
+        return scoreRepository.findByLeaderboardIdAndPlayerAlias(
+                        leaderboard.getId(), playerName)
                 .orElseThrow();
     }
 
@@ -133,14 +133,14 @@ public class ScoreService {
 
         Sort.Direction bestSort = resolveSortDirection(leaderboard.getSortOrder());
 
-        ScoreEntry bestEntry = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(slug, playerAlias, Sort.by(bestSort, "scoreValue"))
+        ScoreEntry bestEntry = scoreRepository.findByLeaderboardIdAndPlayerAlias(leaderboard.getId(), playerAlias)
                 .orElseThrow(() -> new PlayerNotFoundException(playerAlias));
 
         long betterScoresCount;
         if (leaderboard.getSortOrder() == SortOrder.ASC) {
-            betterScoresCount = scoreRepository.countBetterScoresAsc(slug, bestEntry.getScoreValue(), bestEntry.getSubmittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresAsc(leaderboard.getId(), bestEntry.getScoreValue(), bestEntry.getSubmittedAt());
         } else {
-            betterScoresCount = scoreRepository.countBetterScoresDesc(slug, bestEntry.getScoreValue(), bestEntry.getSubmittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresDesc(leaderboard.getId(), bestEntry.getScoreValue(), bestEntry.getSubmittedAt());
         }
 
         long playerRank = betterScoresCount + 1;
@@ -150,8 +150,8 @@ public class ScoreService {
         }
 
         Pageable limit = PageRequest.of(0, surrounding);
-        List<ScoreEntry> higherScores = scoreRepository.findHigherScores(slug, bestEntry.getScoreValue(), bestEntry.getSubmittedAt(), limit).getContent();
-        List<ScoreEntry> lowerScores = scoreRepository.findLowerScores(slug, bestEntry.getScoreValue(), bestEntry.getSubmittedAt(), limit).getContent();
+        List<ScoreEntry> higherScores = scoreRepository.findHigherScores(leaderboard.getId(), bestEntry.getScoreValue(), bestEntry.getSubmittedAt(), limit).getContent();
+        List<ScoreEntry> lowerScores = scoreRepository.findLowerScores(leaderboard.getId(), bestEntry.getScoreValue(), bestEntry.getSubmittedAt(), limit).getContent();
 
         List<ScoreEntry> betterList;
         List<ScoreEntry> worseList;

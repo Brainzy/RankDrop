@@ -12,8 +12,12 @@ import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "score_entries", indexes = {
-        @Index(name = "idx_leaderboard_score",
+        @Index(name = "idx_leaderboard_score_desc",
                 columnList = "leaderboard_id, scoreValue DESC, submittedAt ASC"),
+        @Index(
+                name = "idx_leaderboard_score_asc",
+                columnList = "leaderboard_id, scoreValue ASC, submittedAt ASC"
+        ),
         @Index(name = "idx_leaderboard_player",
                 columnList = "leaderboard_id, playerAlias")
 })

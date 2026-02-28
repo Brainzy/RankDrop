@@ -5,7 +5,6 @@ import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,30 +21,28 @@ public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
     Page<ScoreEntry> findByLeaderboard_Slug(String slug, Pageable pageable);
 
     @Modifying
-    @Query("UPDATE ScoreEntry s SET s.scoreValue = s.scoreValue + :value, s.submittedAt = :now WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias")
-    int incrementScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
+    @Query(value = "UPDATE score_entries SET score_value = score_value + :value, submitted_at = :now WHERE leaderboard_id = :leaderboardId AND player_alias = :playerAlias", nativeQuery = true)
+    int incrementScore(@Param("leaderboardId") Long leaderboardId, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
 
     @Modifying
-    @Query("UPDATE ScoreEntry s SET s.scoreValue = :value, s.submittedAt = :now " +
-            "WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias AND s.scoreValue < :value")
-    int updateIfHigherScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
+    @Query(value = "UPDATE score_entries SET score_value = :value, submitted_at = :now WHERE leaderboard_id = :leaderboardId AND player_alias = :playerAlias AND score_value < :value", nativeQuery = true)
+    int updateIfHigherScore(@Param("leaderboardId") Long leaderboardId, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
 
     @Modifying
-    @Query("UPDATE ScoreEntry s SET s.scoreValue = :value, s.submittedAt = :now " +
-            "WHERE s.leaderboard.slug = :slug AND s.playerAlias = :playerAlias AND s.scoreValue > :value")
-    int updateIfLowerScore(@Param("slug") String slug, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
+    @Query(value = "UPDATE score_entries SET score_value = :value, submitted_at = :now WHERE leaderboard_id = :leaderboardId AND player_alias = :playerAlias AND score_value > :value", nativeQuery = true)
+    int updateIfLowerScore(@Param("leaderboardId") Long leaderboardId, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
 
-    Optional<ScoreEntry> findTopByLeaderboard_SlugAndPlayerAlias(String slug, String playerAlias, Sort sort);
+    Optional<ScoreEntry> findByLeaderboardIdAndPlayerAlias(Long leaderboardId, String playerAlias);
 
-    @Query("SELECT COUNT(s) FROM ScoreEntry s WHERE s.leaderboard.slug = :slug AND (s.scoreValue > :score OR (s.scoreValue = :score AND s.submittedAt < :submittedAt))")
-    long countBetterScoresDesc(@Param("slug") String slug, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt);
+    @Query(value = "SELECT COUNT(*) FROM score_entries WHERE leaderboard_id = :leaderboardId AND (score_value > :score OR (score_value = :score AND submitted_at < :submittedAt))", nativeQuery = true)
+    long countBetterScoresDesc(@Param("leaderboardId") Long leaderboardId, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt);
 
-    @Query("SELECT COUNT(s) FROM ScoreEntry s WHERE s.leaderboard.slug = :slug AND (s.scoreValue < :score OR (s.scoreValue = :score AND s.submittedAt < :submittedAt))")
-    long countBetterScoresAsc(@Param("slug") String slug, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt);
+    @Query(value = "SELECT COUNT(*) FROM score_entries WHERE leaderboard_id = :leaderboardId AND (score_value < :score OR (score_value = :score AND submitted_at < :submittedAt))", nativeQuery = true)
+    long countBetterScoresAsc(@Param("leaderboardId") Long leaderboardId, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt);
 
-    @Query("SELECT s FROM ScoreEntry s WHERE s.leaderboard.slug = :slug AND (s.scoreValue > :score OR (s.scoreValue = :score AND s.submittedAt < :submittedAt)) ORDER BY s.scoreValue ASC, s.submittedAt DESC")
-    Slice<ScoreEntry> findHigherScores(@Param("slug") String slug, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt, Pageable pageable);
+    @Query(value = "SELECT * FROM score_entries WHERE leaderboard_id = :leaderboardId AND (score_value > :score OR (score_value = :score AND submitted_at < :submittedAt)) ORDER BY score_value ASC, submitted_at DESC", nativeQuery = true)
+    Slice<ScoreEntry> findHigherScores(@Param("leaderboardId") Long leaderboardId, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt, Pageable pageable);
 
-    @Query("SELECT s FROM ScoreEntry s WHERE s.leaderboard.slug = :slug AND (s.scoreValue < :score OR (s.scoreValue = :score AND s.submittedAt > :submittedAt)) ORDER BY s.scoreValue DESC, s.submittedAt ASC")
-    Slice<ScoreEntry> findLowerScores(@Param("slug") String slug, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt, Pageable pageable);
+    @Query(value = "SELECT * FROM score_entries WHERE leaderboard_id = :leaderboardId AND (score_value < :score OR (score_value = :score AND submitted_at > :submittedAt)) ORDER BY score_value DESC, submitted_at ASC", nativeQuery = true)
+    Slice<ScoreEntry> findLowerScores(@Param("leaderboardId") Long leaderboardId, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt, Pageable pageable);
 }

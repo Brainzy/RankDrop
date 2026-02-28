@@ -97,10 +97,8 @@ Current status of all features. ✅ = Implemented
 
 ## Database & Storage
 
-### H2 Embedded Database
+### Postgres Database
 
-- [✅] Zero-configuration embedded database
-- [✅] Single-file storage
 - [✅] Optimized indexes for leaderboard queries
 - [✅] Automatic schema migrations
 
@@ -194,7 +192,6 @@ Current status of all features. ✅ = Implemented
 - [ ] Concurrent write performance tests
 - [ ] Read throughput tests
 - [ ] Latency percentile measurements (p50, p95, p99)
-- [ ] Comparison: H2 vs PostgreSQL performance
 
 ### Scale Testing
 
@@ -208,4 +205,4 @@ Current status of all features. ✅ = Implemented
 
 ### v1.0.0 (Target: Q2 2026)
 
-Core leaderboard functionality with H2 database, Docker deployment, Unity SDK, and Swagger documentation.
+Core leaderboard functionality with Postgres database, Docker deployment, Unity SDK, and Swagger documentation.
