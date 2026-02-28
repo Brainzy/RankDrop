@@ -32,7 +32,7 @@ public class LeaderboardController {
             summary = "Get top scores",
             description = "Fetch the leaderboard rankings sorted according to the leaderboard configuration."
     )
-    @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores")
+    @ApiResponse(responseCode = "200", description = "Successfully retrieved top scores", content = @Content(schema = @Schema(implementation = TopScoresListResponse.class)))
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     public TopScoresListResponse getTopScores(
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
