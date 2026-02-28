@@ -11,12 +11,14 @@ Current status of all features. ✅ = Implemented
 - [✅] Submit player scores
 - [✅] Score validation (min/max bounds per leaderboard)
 - [✅] Reject invalid submissions with clear error messages
+- [✅] Atomic concurrent write handling (no lost updates)
 
 ### Leaderboard Queries
 
 - [✅] Fetch top N players (configurable limit: 1-100)
 - [✅] Get player's current rank
-- [✅] Get surrounding players (±5 ranks for context)
+- [✅] Get surrounding players (±N ranks for context)
+- [✅] Combined top scores + player context in single request
 
 ### Performance Optimizations
 
@@ -25,6 +27,8 @@ Current status of all features. ✅ = Implemented
 - [✅] Sub-10ms cached read response times
 - [✅] Connection pooling for database efficiency
 - [✅] Graceful degradation (serve cached data if DB down)
+- [✅] Gzip compression for all JSON responses
+- [✅] Minimal response format to reduce egress
 
 ---
 
@@ -33,7 +37,7 @@ Current status of all features. ✅ = Implemented
 ### Board Types
 
 - [✅] All-time leaderboards (never reset)
-- [✅] Daily, Weekly, Monthly leaderboards (reset without saving or with)
+- [✅] Daily, Weekly, Monthly leaderboards (reset without saving or with archiving)
 - [✅] Manual reset
 
 ### Scoring Modes
@@ -41,7 +45,8 @@ Current status of all features. ✅ = Implemented
 - [✅] Descending sort (high score wins)
 - [✅] Ascending sort (speedrun/lowest time wins)
 - [✅] Cumulative mode (sum all player scores)
-- [✅] One max score per player or multiple entries allowed
+- [✅] Best score only per player
+- [✅] Multiple entries per player
 - [✅] Optional JSON/String metadata per score
 
 ---
@@ -61,6 +66,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Ban players globally (all leaderboards)
 - [✅] Player ban enforcement on score submission
 - [✅] Remove individual scores
+- [✅] Paginated admin score export (max 1000 per page)
 
 ---
 
@@ -97,16 +103,14 @@ Current status of all features. ✅ = Implemented
 
 ## Database & Storage
 
-### Postgres Database
+### PostgreSQL Database
 
+- [✅] PostgreSQL as primary database
 - [✅] Optimized indexes for leaderboard queries
-- [✅] Automatic schema migrations
-
-### PostgreSQL Support
-
-- [ ] Migration script (H2 → PostgreSQL)
-- [ ] Connection pooling for PostgreSQL
-- [ ] Transaction management
+- [✅] Automatic schema migrations via Flyway
+- [✅] Connection pooling via HikariCP
+- [✅] Full transaction management
+- [✅] UTC timestamps throughout
 
 ### Backup & Recovery
 
@@ -129,6 +133,7 @@ Current status of all features. ✅ = Implemented
 - [✅] Structured JSON logging
 - [✅] Configurable log levels (DEBUG/INFO/WARN/ERROR)
 - [✅] Error stack trace capture
+- [✅] Runtime log level changes via Actuator
 
 ---
 
@@ -136,22 +141,26 @@ Current status of all features. ✅ = Implemented
 
 ### Docker Support
 
-- [✅] Optimized Dockerfile (multi-stage build)
-- [✅] Docker Compose configuration
+- [✅] Optimized multi-stage Dockerfile
+- [✅] GraalVM native image compilation (~118MB image, ~50ms startup)
+- [✅] Docker Compose configuration with PostgreSQL
 - [✅] Environment variable configuration
+- [✅] Container health checks
+- [✅] Automatic container restart on failure
 
 ### Hosting Options
 
+- [ ] Google Cloud Free Tier deployment guide
+- [ ] Koyeb + Aiven deployment guide
 - [ ] Oracle Cloud Free Tier deployment guide
 
 ### Operations
 
 - [ ] SSL/HTTPS setup guide (Let's Encrypt + Caddy)
 - [ ] Firewall configuration examples
-- [ ] Reverse proxy configuration (Nginx/Caddy)
+- [ ] Reverse proxy configuration (Caddy)
 - [ ] Automated health check monitoring script
 - [ ] Log rotation configuration
-- [ ] System resource monitoring
 
 ---
 
@@ -173,14 +182,13 @@ Current status of all features. ✅ = Implemented
 - [✅] Example responses for all endpoints
 - [✅] Authentication flow documentation
 - [✅] Error code reference
+- [✅] README and Architecture documentation
 
 ### Developer Experience
 
 - [✅] One-click "Authorize" in Swagger UI
 - [✅] Try-it-out functionality for all endpoints
 - [✅] Request/response schema definitions
-- [✅] Comprehensive README
-- [✅] Quick start guide
 - [ ] Troubleshooting guide
 
 ---
@@ -198,11 +206,13 @@ Current status of all features. ✅ = Implemented
 - [ ] Load testing with 1K concurrent users
 - [ ] Load testing with 10K concurrent users
 - [ ] Load testing with 100K concurrent users
-- [ ] Database migration testing (10M records)
 - [ ] Endurance testing (24hr+ continuous load)
+
+---
 
 ## Version History
 
 ### v1.0.0 (Target: Q2 2026)
 
-Core leaderboard functionality with Postgres database, Docker deployment, Unity SDK, and Swagger documentation.
+Core leaderboard functionality with PostgreSQL database, GraalVM native image, Docker deployment, Unity SDK, and Swagger
+documentation.
