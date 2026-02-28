@@ -40,6 +40,30 @@ cp .env.example .env   # fill in your secrets
 docker compose up
 ```
 
+To run localy in Editor:
+docker compose up -d postgres # Start PostgreSQL container only
+in IntelliJ press play (if env is setup correctly)
+
+To run app in docker
+docker compose build rankdrop
+
+To save built image
+docker tag rankdrop-rankdrop-app:latest rankdrop-app:v1
+docker save rankdrop-app:v1 -o rankdrop-app-v1.tar
+
+To run saved image
+docker load -i rankdrop-app-v1.tar
+docker run -d \
+--name rankdrop-app \
+--network your_docker_network \
+-p 8080:8080 \
+-e DB_HOST=postgres \
+-e DB_PORT=5432 \
+-e DB_NAME=rankdrop \
+-e DB_USERNAME=rankdrop \
+-e DB_PASSWORD=rankdrop \
+rankdrop-app:v1
+
 Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
 
 ---
