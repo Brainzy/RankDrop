@@ -47,17 +47,17 @@ public class ScoreService {
 
         validateScore(value, leaderboard);
 
-        ScoreSubmitResponse response = switch (leaderboard.getScoreStrategy()) {
-            case CUMULATIVE -> handleCumulativeScoreSubmission(leaderboard, playerName, value, metadata);
-            case BEST_ONLY -> handleSingleScoreSubmission(leaderboard, playerName, value, metadata);
-            case MULTIPLE_ENTRIES -> createAndSaveScore(leaderboard, playerName, value, metadata);
+        ScoreEntry savedEntry = switch (leaderboard.getScoreStrategy()) {
+            case CUMULATIVE -> handleCumulativeScoreSubmissionEntry(leaderboard, playerName, value, metadata);
+            case BEST_ONLY -> handleSingleScoreSubmissionEntry(leaderboard, playerName, value, metadata);
+            case MULTIPLE_ENTRIES -> createAndSaveScoreEntry(leaderboard, playerName, value, metadata);
         };
 
         long betterScoresCount;
         if (leaderboard.getSortOrder() == SortOrder.ASC) {
-            betterScoresCount = scoreRepository.countBetterScoresAsc(slug, response.scoreValue(), response.submittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresAsc(slug, savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
         } else {
-            betterScoresCount = scoreRepository.countBetterScoresDesc(slug, response.scoreValue(), response.submittedAt());
+            betterScoresCount = scoreRepository.countBetterScoresDesc(slug, savedEntry.getScoreValue(), savedEntry.getSubmittedAt());
         }
 
         if (betterScoresCount < 100) {
@@ -66,7 +66,7 @@ public class ScoreService {
 
         webhookService.fireTopScoreWebhookIfEligible(slug, playerName, value, (int) betterScoresCount + 1);
 
-        return response;
+        return ScoreSubmitResponse.fromEntity(savedEntry, betterScoresCount + 1);
     }
 
     private void validateScore(double value, Leaderboard leaderboard) {
@@ -78,21 +78,20 @@ public class ScoreService {
         }
     }
 
-    private ScoreSubmitResponse handleCumulativeScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
+    private ScoreEntry handleCumulativeScoreSubmissionEntry(Leaderboard leaderboard, String playerName, double value, String metadata) {
         int rowsUpdated = scoreRepository.incrementScore(
                 leaderboard.getSlug(), playerName, value, LocalDateTime.now(ZoneOffset.UTC));
 
         if (rowsUpdated == 0) {
-            return createAndSaveScore(leaderboard, playerName, value, metadata);
+            return createAndSaveScoreEntry(leaderboard, playerName, value, metadata);
         }
 
         return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
                         leaderboard.getSlug(), playerName, Sort.unsorted())
-                .map(ScoreSubmitResponse::fromEntity)
                 .orElseThrow(() -> new IllegalStateException("Score not found after increment for player: " + playerName));
     }
 
-    private ScoreSubmitResponse handleSingleScoreSubmission(Leaderboard leaderboard, String playerName, double value, String metadata) {
+    private ScoreEntry handleSingleScoreSubmissionEntry(Leaderboard leaderboard, String playerName, double value, String metadata) {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
 
         int rowsUpdated = leaderboard.getSortOrder() == SortOrder.ASC
@@ -103,17 +102,16 @@ public class ScoreService {
             Optional<ScoreEntry> existing = scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
                     leaderboard.getSlug(), playerName, Sort.unsorted());
 
-            return existing.map(ScoreSubmitResponse::fromEntity).orElseGet(() -> createAndSaveScore(leaderboard, playerName, value, metadata));
+            return existing.orElseGet(() -> createAndSaveScoreEntry(leaderboard, playerName, value, metadata));
 
         }
 
         return scoreRepository.findTopByLeaderboard_SlugAndPlayerAlias(
                         leaderboard.getSlug(), playerName, Sort.unsorted())
-                .map(ScoreSubmitResponse::fromEntity)
                 .orElseThrow();
     }
 
-    private ScoreSubmitResponse createAndSaveScore(Leaderboard leaderboard, String playerName, double value, String metadata) {
+    private ScoreEntry createAndSaveScoreEntry(Leaderboard leaderboard, String playerName, double value, String metadata) {
         ScoreEntry entry = ScoreEntry.builder()
                 .playerAlias(playerName)
                 .scoreValue(value)
@@ -121,7 +119,7 @@ public class ScoreService {
                 .metadata(metadata)
                 .build();
 
-        return ScoreSubmitResponse.fromEntity(scoreRepository.save(entry));
+        return scoreRepository.save(entry);
     }
 
     public List<ScoreEntryResponse> getTopScores(String slug, int limit) {

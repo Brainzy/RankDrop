@@ -54,7 +54,7 @@ public class LeaderboardController {
             summary = "Submit a score",
             description = "Submit a new score for a player. The score will be validated against the leaderboard's min/max constraints."
     )
-    @ApiResponse(responseCode = "200", description = "Score submitted successfully")
+    @ApiResponse(responseCode = "200", description = "Score submitted successfully", content = @Content(schema = @Schema(implementation = ScoreSubmitResponse.class)))
     @ApiResponse(responseCode = "404", description = "Leaderboard not found", content = @Content(schema = @Schema(hidden = true)))
     @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(hidden = true)))
     public ScoreSubmitResponse submitScore(
