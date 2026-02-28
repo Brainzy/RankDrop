@@ -1,15 +1,17 @@
 services:
-  rankdrop:
+  rankdrop-app:
     build: .
+    container_name: rankdrop-app
     ports:
       - "8080:8080"
     environment:
       - ADMIN_SECRET=${ADMIN_SECRET}
       - GAME_SECRET=${GAME_SECRET}
-      - DB_HOST=postgres
+      - DB_HOST=postgres         # must match postgres container name
+      - DB_PORT=5432             # internal port
       - DB_NAME=rankdrop
-      - DB_USERNAME=${DB_USERNAME:-rankdrop}
-      - DB_PASSWORD=${DB_PASSWORD:-rankdrop}
+      - DB_USERNAME=rankdrop
+      - DB_PASSWORD=rankdrop
     volumes:
       - ./backups:/app/backups
     depends_on:
@@ -25,12 +27,15 @@ services:
 
   postgres:
     image: postgres:16-alpine
+    container_name: postgres
     environment:
       - POSTGRES_DB=rankdrop
-      - POSTGRES_USER=${DB_USERNAME:-rankdrop}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-rankdrop}
+      - POSTGRES_USER=rankdrop
+      - POSTGRES_PASSWORD=rankdrop
     volumes:
       - ./data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"   # optional host access
     restart: unless-stopped
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U rankdrop" ]

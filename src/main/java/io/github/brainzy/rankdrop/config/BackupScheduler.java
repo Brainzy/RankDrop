@@ -3,15 +3,18 @@ package io.github.brainzy.rankdrop.config;
 import io.github.brainzy.rankdrop.service.SystemSettingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.stream.Stream;
 
 @Component
@@ -19,41 +22,81 @@ import java.util.stream.Stream;
 @Slf4j
 public class BackupScheduler {
 
-    private final JdbcTemplate jdbcTemplate;
     private final SystemSettingService systemSettingService;
 
-    @Scheduled(cron = "0 0 2 * * *")
+    @Value("${DB_HOST}")
+    private String dbHost;
+
+    @Value("${DB_NAME}")
+    private String dbName;
+
+    @Value("${DB_USERNAME}")
+    private String dbUser;
+
+    @Value("${DB_PASSWORD}")
+    private String dbPassword;
+
+    @Scheduled(cron = "0 0 2 * * *", zone = "UTC")
     public void performBackup() {
         try {
             int retentionDays = Integer.parseInt(
                     systemSettingService.getSetting("BACKUP_RETENTION_DAYS", "3"));
-            String backupPath = systemSettingService.getSetting("BACKUP_PATH", "./backups");
 
-            Path backupDir = Paths.get(backupPath);
+            Path backupDir = Paths.get("/app/backups");
             Files.createDirectories(backupDir);
 
-            String timestamp = LocalDate.now().toString();
-            String destination = backupDir.resolve("rankdrop-" + timestamp + ".mv.db").toString();
+            String timestamp = LocalDate.now(ZoneOffset.UTC).toString();
+            String destination = backupDir
+                    .resolve("rankdrop-" + timestamp + ".dump")
+                    .toString();
 
-            jdbcTemplate.execute("BACKUP TO '" + destination + "'");
-            log.info("Backup created: {}", destination);
+            ProcessBuilder pb = new ProcessBuilder(
+                    "/usr/bin/pg_dump",
+                    "-h", dbHost,
+                    "-p", "5432",
+                    "-U", dbUser,
+                    "-d", dbName,
+                    "--format=custom",
+                    "--compress=9",
+                    "--clean",
+                    "--if-exists",
+                    "-f", destination
+            );
 
-            deleteOldBackups(backupDir, retentionDays);
+            pb.environment().put("PGPASSWORD", dbPassword);
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+
+            try (BufferedReader reader =
+                         new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                reader.lines().forEach(log::info);
+            }
+
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                log.info("Backup created: {}", destination);
+                deleteOldBackups(backupDir, retentionDays);
+            } else {
+                log.error("Backup failed with exit code {}", exitCode);
+            }
+
         } catch (Exception e) {
-            log.error("Backup failed: {}", e.getMessage());
+            log.error("Backup failed", e);
         }
     }
 
     private void deleteOldBackups(Path backupDir, int retentionDays) throws IOException {
-        LocalDate cutoff = LocalDate.now().minusDays(retentionDays);
+        LocalDate cutoff = LocalDate.now(ZoneOffset.UTC).minusDays(retentionDays);
 
         try (Stream<Path> files = Files.list(backupDir)) {
             files.filter(p -> p.getFileName().toString().startsWith("rankdrop-"))
+                    .filter(p -> p.getFileName().toString().endsWith(".dump"))
                     .filter(p -> {
-                        String fileName = p.getFileName().toString();
-                        String dateStr = fileName
+                        String dateStr = p.getFileName().toString()
                                 .replace("rankdrop-", "")
-                                .replace(".mv.db", "");
+                                .replace(".dump", "");
                         try {
                             return LocalDate.parse(dateStr).isBefore(cutoff);
                         } catch (Exception e) {
@@ -62,10 +105,10 @@ public class BackupScheduler {
                     })
                     .forEach(p -> {
                         try {
-                            Files.delete(p);
+                            Files.deleteIfExists(p);
                             log.info("Deleted old backup: {}", p);
                         } catch (IOException e) {
-                            log.warn("Failed to delete old backup: {}", p);
+                            log.warn("Failed to delete {}", p);
                         }
                     });
         }
