@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -25,7 +24,6 @@ public class LeaderboardScheduler {
 
 
     @Scheduled(fixedRate = 60000) // Run every minute
-    @Transactional
     public void processScheduledResets() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         List<Leaderboard> dueResets = leaderboardRepository.findAllByNextResetAtBefore(now);

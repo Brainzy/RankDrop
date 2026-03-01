@@ -86,6 +86,7 @@ public class LeaderboardService {
         performReset(board, request.archiveScores(), request.resetLabel());
     }
 
+    @Transactional
     public void performReset(Leaderboard board, boolean archive, String resetLabel) {
         if (archive) {
             if (resetLabel == null || resetLabel.isBlank()) {
