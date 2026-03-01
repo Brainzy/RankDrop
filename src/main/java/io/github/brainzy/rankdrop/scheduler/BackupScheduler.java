@@ -1,4 +1,4 @@
-package io.github.brainzy.rankdrop.config;
+package io.github.brainzy.rankdrop.scheduler;
 
 import io.github.brainzy.rankdrop.service.SystemSettingService;
 import lombok.RequiredArgsConstructor;
@@ -24,16 +24,16 @@ public class BackupScheduler {
 
     private final SystemSettingService systemSettingService;
 
-    @Value("${DB_HOST}")
+    @Value("${DB_HOST:localhost}")
     private String dbHost;
 
-    @Value("${DB_NAME}")
+    @Value("${DB_NAME:rankdrop}")
     private String dbName;
 
-    @Value("${DB_USERNAME}")
+    @Value("${DB_USERNAME:rankdrop}")
     private String dbUser;
 
-    @Value("${DB_PASSWORD}")
+    @Value("${DB_PASSWORD:rankdrop}")
     private String dbPassword;
 
     @Scheduled(cron = "0 0 2 * * *", zone = "UTC")
