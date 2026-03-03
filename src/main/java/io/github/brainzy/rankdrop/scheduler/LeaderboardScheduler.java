@@ -23,7 +23,7 @@ public class LeaderboardScheduler {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 
-    @Scheduled(fixedRate = 60000) // Run every minute
+    @Scheduled(fixedRate = 60000, initialDelay = 10000)
     public void processScheduledResets() {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         List<Leaderboard> dueResets = leaderboardRepository.findAllByNextResetAtBefore(now);

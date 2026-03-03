@@ -1,0 +1,18 @@
+// In your DataInitializer - inject Flyway to ensure it runs first
+@Bean
+CommandLineRunner initDatabase(LeaderboardRepository leaderboardRepository,
+                               SystemSettingService systemSettingService,
+                               Flyway flyway) {
+    return args -> {
+        flyway.migrate(); // Ensure migrations run before any queries
+        log.info("Finding by slug in DataInitializer");
+        if (leaderboardRepository.findBySlug("global-high-scores").isEmpty()) {
+            Leaderboard lb = Leaderboard.builder()
+                    .slug("global-high-scores")
+                    .displayName("🏆 Global High Scores")
+                    .build();
+            leaderboardRepository.save(lb);
+            log.info("Database seeded: Global Leaderboard created");
+        }
+    };
+}

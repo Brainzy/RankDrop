@@ -1,0 +1,9 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "db/migration/V1__initial_schema.sql"
+      }
+    ]
+  }
+}
