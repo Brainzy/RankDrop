@@ -1,0 +1,29 @@
+[
+{
+  "name": "org.flywaydb.core.Flyway",
+  "allDeclaredConstructors": true,
+  "allPublicConstructors": true,
+  "allDeclaredMethods": true,
+  "allPublicMethods": true,
+  "allDeclaredFields": true,
+  "allPublicFields": true
+},
+{
+  "name": "org.flywaydb.core.api.configuration.FluentConfiguration",
+  "allDeclaredConstructors": true,
+  "allPublicConstructors": true,
+  "allDeclaredMethods": true,
+  "allPublicMethods": true,
+  "allDeclaredFields": true,
+  "allPublicFields": true
+},
+{
+  "name": "org.flywaydb.core.internal.configuration.ConfigUtils",
+  "allDeclaredConstructors": true,
+  "allPublicConstructors": true,
+  "allDeclaredMethods": true,
+  "allPublicMethods": true,
+  "allDeclaredFields": true,
+  "allPublicFields": true
+}
+]

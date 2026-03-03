@@ -1,0 +1,9 @@
+package io.github.brainzy.rankdrop.config;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConditionalOnProperty(name = "spring.flyway.enabled", havingValue = "true")
+public class FlywayConfig {
+}

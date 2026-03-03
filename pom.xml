@@ -146,11 +146,6 @@
                 <configuration>
                     <mainClass>io.github.brainzy.rankdrop.RankDropApplication</mainClass>
                     <imageName>rankdrop</imageName>
-                    <resources>
-                        <includes>
-                            <include>db/migration/.*\.sql</include>
-                        </includes>
-                    </resources>
                 </configuration>
             </plugin>
         </plugins>
