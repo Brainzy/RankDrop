@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -21,6 +22,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Lazy
 public class ApiKeyInterceptor implements HandlerInterceptor {
 
     private final SystemSettingService systemSettingService;
@@ -38,12 +40,9 @@ public class ApiKeyInterceptor implements HandlerInterceptor {
             log.error("CRITICAL: ADMIN_SECRET is not set! Admin endpoints will be inaccessible.");
         }
 
-        String dbKey = systemSettingService.getSetting("GAME_SECRET");
         boolean hasEnvKey = gameSecret != null && !gameSecret.isBlank();
-        boolean hasDbKey = dbKey != null && !dbKey.isBlank();
-
-        if (!hasEnvKey && !hasDbKey) {
-            log.warn("WARNING: No GAME_SECRET configured. Score submission will be inaccessible.");
+        if (!hasEnvKey) {
+            log.warn("WARNING: No GAME_SECRET env var configured. Will check database on first request.");
         }
     }
 

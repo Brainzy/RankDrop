@@ -71,7 +71,13 @@ public class LeaderboardService {
     public void deleteLeaderboardBySlug(String slug) {
         Leaderboard board = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
-        scoreEntryRepository.deleteByLeaderboard(board);
+        
+        // Explicitly delete entries since relationship was removed
+        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(slug, Pageable.unpaged()).getContent();
+        if (!entries.isEmpty()) {
+            scoreEntryRepository.deleteAllInBatch(entries);
+        }
+        
         leaderboardRepository.delete(board);
     }
 

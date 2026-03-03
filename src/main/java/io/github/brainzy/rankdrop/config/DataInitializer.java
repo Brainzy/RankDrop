@@ -18,6 +18,7 @@ public class DataInitializer {
     CommandLineRunner initDatabase(LeaderboardRepository leaderboardRepository,
                                    SystemSettingService systemSettingService) {
         return args -> {
+            log.info("Finding by slug in DataInitializer");
             if (leaderboardRepository.findBySlug("global-high-scores").isEmpty()) {
                 Leaderboard lb = Leaderboard.builder()
                         .slug("global-high-scores")
