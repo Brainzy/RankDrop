@@ -110,8 +110,7 @@ Full interactive documentation at `/swagger-ui/index.html`.
 RankDrop is designed to run free forever on:
 
 - **[Google Cloud Free Tier](docs/deploy-gcp.md)** — limited by 1GB egress
-- **[Koyeb + Aiven](docs/deploy-koyeb.md)** — no card required, sleeps after 60 min of no interaction for about 3
-  seconds
+- **[Koyeb + Aiven](docs/deploy-koyeb.md)** — sleeps after 60 min of no interaction for about 3 seconds
 - **[Oracle Cloud Free Tier](docs/deploy-oracle.md)** — painful signup
 
 > Hosting providers control their own pricing and free tier terms. RankDrop itself is always free and open source.
