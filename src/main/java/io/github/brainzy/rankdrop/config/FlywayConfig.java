@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportRuntimeHints;
 
 import javax.sql.DataSource;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 @Configuration
@@ -30,14 +32,22 @@ public class FlywayConfig implements BeanFactoryPostProcessor {
     }
 
     @Bean
-    public Flyway flyway(DataSource dataSource) {
+    public Flyway flyway(DataSource dataSource) throws Exception {
         var resource = getClass().getClassLoader()
-                .getResource("db/migration/V1__initial_schema.sql");
-        log.info("Migration file found: {}", resource);
+                .getResourceAsStream("db/migration/V1__initial_schema.sql");
+
+        Path tempDir = Files.createTempDirectory("flyway-migrations");
+        Path tempSql = tempDir.resolve("V1__initial_schema.sql");
+
+        if (resource != null) {
+            Files.copy(resource, tempSql);
+        } else {
+            log.info("Could not find resource,");
+        }
 
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
-                .locations("classpath:/db/migration")
+                .locations("filesystem:" + tempDir)
                 .schemas("public")
                 .defaultSchema("public")
                 .createSchemas(true)
