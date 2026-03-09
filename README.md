@@ -50,6 +50,8 @@ infrastructure you control.
 
 ---
 
+![RankDrop API](assets/swagger-preview.png)
+
 ## Quick Start
 
 Requires Docker.
