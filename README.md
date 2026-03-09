@@ -95,12 +95,14 @@ docker run -d \
 
 ### Client API
 
-| Method | Endpoint                                      | Description                                    |
-|--------|-----------------------------------------------|------------------------------------------------|
-| `POST` | `/api/v1/leaderboards/{slug}/scores`          | Submit a score                                 |
-| `GET`  | `/api/v1/leaderboards/{slug}/top`             | Get top N scores                               |
-| `GET`  | `/api/v1/leaderboards/{slug}/players/{alias}` | Get player rank and surrounding scores         |
-| `GET`  | `/api/v1/leaderboards/{slug}/context`         | Get top scores + player context in one request |
+| Method | Endpoint                                                     | Description                                                                                  |
+|--------|--------------------------------------------------------------|----------------------------------------------------------------------------------------------|
+| `POST` | `/api/v1/leaderboards/{slug}/scores`                         | Submit a score                                                                               |
+| `GET`  | `/api/v1/leaderboards/{slug}/top`                            | Get top N scores. Param: `limit` (default 10)                                                |
+| `GET`  | `/api/v1/leaderboards/{slug}/players/{playerAlias}`          | Player rank and surrounding scores. Param: `surrounding` (default 0)                         |
+| `GET`  | `/api/v1/leaderboards/{slug}/players/{playerAlias}/metadata` | Same as above with metadata included                                                         |
+| `GET`  | `/api/v1/leaderboards/{slug}/combined`                       | Top scores + player context in one request. Params: `topLimit`, `playerAlias`, `surrounding` |
+| `GET`  | `/api/v1/leaderboards/{slug}/combined/metadata`              | Same as above with metadata included                                                         |
 
 ### Admin API
 
