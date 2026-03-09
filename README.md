@@ -9,14 +9,19 @@ Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
 
 ## ⚡ 60-Second Deploy for Unity
 
-Don't want to manage infrastructure? The **RankDrop Unity Asset** deploys a fully configured leaderboard backend in 60
-seconds — no server knowledge required.
+| Path                                 | Deploy   | Unity integration | Total      |
+|--------------------------------------|----------|-------------------|------------|
+| Manual self-host                     | ~10 min  | 30–60 min         | ~1 hour    |
+| RankDrop Unity Asset *(coming soon)* | included | included          | 60 seconds |
 
-- 🎮 **[Unity Asset Store](#)** — $19, available soon
-- ☁️ **[TurnKit.dev](https://turnkit.dev)** — follow the build for hosted version and no code turn based games backend
-  including relay, matchmaking, and player economy, get notified at launch
+The manual path is free and fully documented below. If you'd rather skip the hour, the **RankDrop Unity Asset** handles
+both deploy and Unity integration in 60 seconds.
 
-RankDrop is also the leaderboard module foundation of **[TurnKit](https://turnkit.dev)**
+- 🎮 **[Unity Asset Store](#)** — coming soon
+- ☁️ **[TurnKit.dev](https://turnkit.dev)** — follow the build, get notified at launch
+
+RankDrop is also the leaderboard foundation of **[TurnKit](https://turnkit.dev)** — a no-code multiplayer backend for
+turn-based games including relay, matchmaking, and player economy.
 
 ---
 
@@ -26,7 +31,7 @@ RankDrop is for developers who want a leaderboard backend without paying monthly
 their data. If your game or app needs score tracking, rankings, or competitive features — RankDrop runs on
 infrastructure you control.
 
-- **Self-host for free** — runs on Oracle Cloud, Koyeb, or any VPS
+- **Self-host for free** — runs on Koyeb, Oracle Cloud, or any VPS
 - **Full control** — your database, your data, your rules
 - **No lock-in** — open source, Apache 2.0
 
@@ -120,28 +125,31 @@ Full interactive documentation at `/swagger-ui/index.html`.
 
 ## Tech Stack
 
-| Layer      | Technology                                                         |
-|------------|--------------------------------------------------------------------|
-| Runtime    | Java 25, Spring Boot 4.x                                           |
-| Native     | GraalVM — native image (~50ms startup) and JVM mode both supported |
-| Database   | PostgreSQL                                                         |
-| Migrations | Flyway                                                             |
-| Docs       | OpenAPI 3 / Swagger UI                                             |
-| Deployment | Docker, Docker Compose                                             |
+| Layer      | Technology                           |
+|------------|--------------------------------------|
+| Runtime    | Java 25, Spring Boot 4.x             |
+| Native     | GraalVM native image (~50ms startup) |
+| Database   | PostgreSQL                           |
+| Migrations | Flyway                               |
+| Docs       | OpenAPI 3 / Swagger UI               |
+| Deployment | Docker, Docker Compose               |
 
 ---
 
 ## Hosting
 
-RankDrop is designed to run free on:
+RankDrop is designed to run free or near-free on:
 
-| Provider                   | Notes                                                                                                                                               |
-|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Oracle Cloud Free Tier** | 4 OCPU, 24GB RAM — handles serious player counts for free. Signup can be painful but worth it for scale.                                            |
-| **Koyeb + Aiven**          | Koyeb runs RankDrop on 512MB RAM, Aiven provides free managed PostgreSQL. Both have free tiers. App sleeps after 60 min inactivity (~3s wake time). |
+| Provider                   | Notes                                                                                                                                                                       |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Koyeb + Aiven**          | Koyeb runs RankDrop on 512MB RAM, Aiven provides free managed PostgreSQL. Both have free tiers. App sleeps after 60 min inactivity (~3s wake time). Easiest starting point. |
+| **Oracle Cloud Free Tier** | 4 OCPU, 24GB RAM — handles serious player counts for free. No sleep. Signup can be painful but worth it if you outgrow Koyeb.                                               |
+| **Any VPS**                | Hetzner, DigitalOcean, Fly.io — RankDrop is a single Docker container, runs anywhere.                                                                                       |
+
+Deploying on a VPS or Oracle Cloud? We recommend [Caddy](https://caddyserver.com) as a reverse proxy for automatic
+HTTPS — not needed on Koyeb which handles it automatically.
 
 > Hosting providers control their own pricing and free tier terms. RankDrop itself is always free and open source.
-> "Deploying on a VPS or Oracle Cloud? We recommend Caddy as a reverse proxy for automatic HTTPS."
 
 ---
 
