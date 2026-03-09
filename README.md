@@ -1,18 +1,34 @@
 # 🏆 RankDrop
 
-**Self-hosted leaderboard backend for any application. Own your data, zero recurring cost.**
+**Self-hosted leaderboard backend for games and apps. Own your data, zero recurring cost.**
 
-> Deploy on Google Cloud, Koyeb, or Oracle Cloud free tier. No pricing per user, no vendor lock-in, no surprises.
+Deploy on your own infrastructure in minutes. No pricing per user, no vendor lock-in, no surprises.
+Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
+
+---
+
+## ⚡ 60-Second Deploy for Unity
+
+Don't want to manage infrastructure? The **RankDrop Unity Asset** deploys a fully configured leaderboard backend in 60
+seconds — no server knowledge required.
+
+- 🎮 **[Unity Asset Store](#)** — $19, available soon
+- ☁️ **[TurnKit.dev](https://turnkit.dev)** — follow the build for hosted version and no code turn based games backend
+  including relay, matchmaking, and player economy, get notified at launch
+
+RankDrop is also the leaderboard module foundation of **[TurnKit](https://turnkit.dev)**
 
 ---
 
 ## Who Is This For?
 
 RankDrop is for developers who want a leaderboard backend without paying monthly fees or trusting third parties with
-their data. If your app needs score tracking, rankings, or competitive features — RankDrop runs on infrastructure you
-control.
+their data. If your game or app needs score tracking, rankings, or competitive features — RankDrop runs on
+infrastructure you control.
 
-Works with any HTTP client — mobile, web, desktop, or game engines.
+- **Self-host for free** — runs on Oracle Cloud, Koyeb, or any VPS
+- **Full control** — your database, your data, your rules
+- **No lock-in** — open source, Apache 2.0
 
 ---
 
@@ -40,31 +56,38 @@ cp .env.example .env   # fill in your secrets
 docker compose up
 ```
 
-To run localy in Editor:
-docker compose up -d postgres # Start PostgreSQL container only
-in IntelliJ press play (if env is setup correctly)
+Swagger UI available at `http://localhost:8080/swagger-ui/index.html`
 
-To run app in docker
+### Local Development (IntelliJ)
+
+```bash
+docker compose up -d postgres   # start PostgreSQL only
+# then press Play in IntelliJ
+```
+
+### Build & Save Docker Image
+
+```bash
 docker compose build rankdrop
-
-To save built image
 docker tag rankdrop-rankdrop-app:latest rankdrop-app:v1
 docker save rankdrop-app:v1 -o rankdrop-app-v1.tar
+```
 
-To run saved image
+### Run Saved Image
+
+```bash
 docker load -i rankdrop-app-v1.tar
 docker run -d \
---name rankdrop-app \
---network your_docker_network \
--p 8080:8080 \
--e DB_HOST=postgres \
--e DB_PORT=5432 \
--e DB_NAME=rankdrop \
--e DB_USERNAME=rankdrop \
--e DB_PASSWORD=rankdrop \
-rankdrop-app:v1
-
-Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
+  --name rankdrop-app \
+  --network your_docker_network \
+  -p 8080:8080 \
+  -e DB_HOST=postgres \
+  -e DB_PORT=5432 \
+  -e DB_NAME=rankdrop \
+  -e DB_USERNAME=rankdrop \
+  -e DB_PASSWORD=rankdrop \
+  rankdrop-app:v1
+```
 
 ---
 
@@ -74,10 +97,10 @@ Swagger UI: [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/
 
 | Method | Endpoint                                      | Description                                    |
 |--------|-----------------------------------------------|------------------------------------------------|
-| POST   | `/api/v1/leaderboards/{slug}/scores`          | Submit a score                                 |
-| GET    | `/api/v1/leaderboards/{slug}/top`             | Get top N scores                               |
-| GET    | `/api/v1/leaderboards/{slug}/players/{alias}` | Get player rank and surrounding scores         |
-| GET    | `/api/v1/leaderboards/{slug}/context`         | Get top scores + player context in one request |
+| `POST` | `/api/v1/leaderboards/{slug}/scores`          | Submit a score                                 |
+| `GET`  | `/api/v1/leaderboards/{slug}/top`             | Get top N scores                               |
+| `GET`  | `/api/v1/leaderboards/{slug}/players/{alias}` | Get player rank and surrounding scores         |
+| `GET`  | `/api/v1/leaderboards/{slug}/context`         | Get top scores + player context in one request |
 
 ### Admin API
 
@@ -95,23 +118,25 @@ Full interactive documentation at `/swagger-ui/index.html`.
 
 ## Tech Stack
 
-| Layer      | Technology                                   |
-|------------|----------------------------------------------|
-| Runtime    | Java 25, Spring Boot 4.x                     |
-| Database   | PostgreSQL                                   |
-| Migrations | Flyway                                       |
-| Docs       | OpenAPI 3 / Swagger UI                       |
-| Deployment | Docker, Docker Compose, GraalVM Native Image |
+| Layer      | Technology                                                         |
+|------------|--------------------------------------------------------------------|
+| Runtime    | Java 25, Spring Boot 4.x                                           |
+| Native     | GraalVM — native image (~50ms startup) and JVM mode both supported |
+| Database   | PostgreSQL                                                         |
+| Migrations | Flyway                                                             |
+| Docs       | OpenAPI 3 / Swagger UI                                             |
+| Deployment | Docker, Docker Compose                                             |
 
 ---
 
 ## Hosting
 
-RankDrop is designed to run free forever on:
+RankDrop is designed to run free on:
 
-- **[Google Cloud Free Tier](docs/deploy-gcp.md)** — limited by 1GB egress
-- **[Koyeb + Aiven](docs/deploy-koyeb.md)** — sleeps after 60 min of no interaction for about 3 seconds
-- **[Oracle Cloud Free Tier](docs/deploy-oracle.md)** — painful signup
+| Provider                   | Notes                                                                                                                                               |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Oracle Cloud Free Tier** | 4 OCPU, 24GB RAM — handles serious player counts for free. Signup can be painful but worth it for scale.                                            |
+| **Koyeb + Aiven**          | Koyeb runs RankDrop on 512MB RAM, Aiven provides free managed PostgreSQL. Both have free tiers. App sleeps after 60 min inactivity (~3s wake time). |
 
 > Hosting providers control their own pricing and free tier terms. RankDrop itself is always free and open source.
 
@@ -119,17 +144,22 @@ RankDrop is designed to run free forever on:
 
 ## Further Reading
 
-- [FEATURES.md](FEATURES.md) — full breakdown of implemented and planned features
-- [ARCHITECTURE.md](ARCHITECTURE.md) — technical design decisions and rationale
+- **FEATURES.md** — full breakdown of implemented and planned features
+- **ARCHITECTURE.md** — technical design decisions and rationale
 
 ---
 
 ## License
 
-Apache 2.0 License. See [LICENSE](LICENSE) for details.
+Apache 2.0 — see [LICENSE](LICENSE) for details.
 
-The deployment tooling and Unity SDK are proprietary and not covered by this license.
+The Unity Asset deployment tooling is proprietary and not covered by this license.
 
 ---
 
-Built by [Brainzy](https://github.com/Brainzy)
+## Part of TurnKit
+
+RankDrop is the leaderboard module powering **[TurnKit.dev](https://turnkit.dev)** — a no-code backend for turn-based
+multiplayer games. Relay, matchmaking, player economy, and leaderboards. No backend code required.
+
+[Follow the build at TurnKit.dev →](https://turnkit.dev)
