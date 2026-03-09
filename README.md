@@ -141,6 +141,7 @@ RankDrop is designed to run free on:
 | **Koyeb + Aiven**          | Koyeb runs RankDrop on 512MB RAM, Aiven provides free managed PostgreSQL. Both have free tiers. App sleeps after 60 min inactivity (~3s wake time). |
 
 > Hosting providers control their own pricing and free tier terms. RankDrop itself is always free and open source.
+> "Deploying on a VPS or Oracle Cloud? We recommend Caddy as a reverse proxy for automatic HTTPS."
 
 ---
 
