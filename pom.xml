@@ -20,7 +20,6 @@
     </properties>
 
     <dependencies>
-        <!-- Swagger / OpenAPI - 3.x required for Spring Boot 4 -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
@@ -44,7 +43,6 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        <!-- PostgreSQL - H2 removed -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
@@ -59,7 +57,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
-        <!-- Flyway core + PostgreSQL module -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
@@ -80,10 +77,33 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>13.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>2.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>1.21.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>1.21.4</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -137,13 +157,6 @@
                         <configuration>
                             <mainClass>io.github.brainzy.rankdrop.RankDropApplication</mainClass>
                             <imageName>rankdrop</imageName>
-                            <resources>
-                                <includes>
-                                    <include>
-                                        <pattern>db/migration/.*\.sql</pattern>
-                                    </include>
-                                </includes>
-                            </resources>
                         </configuration>
                         <executions>
                             <execution>
