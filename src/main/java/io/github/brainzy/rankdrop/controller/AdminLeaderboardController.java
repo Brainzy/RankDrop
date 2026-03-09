@@ -56,7 +56,7 @@ public class AdminLeaderboardController {
             @Parameter(description = "The unique slug of the leaderboard", example = "global-high-scores")
             @PathVariable String slug, @Valid @RequestBody LeaderboardUpdateRequest request) {
         return ResponseEntity.ok(
-                leaderboardService.updateExistingLeaderboard(slug, request.displayName())
+                leaderboardService.updateExistingLeaderboard(slug, request.getDisplayName())
         );
     }
 

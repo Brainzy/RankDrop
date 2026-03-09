@@ -33,7 +33,7 @@ public class AdminSettingsController {
     @ApiResponse(responseCode = "400", description = "Invalid key", content = @Content(schema = @Schema(example = "{\"error\": \"Invalid key\", \"message\": \"Game key must be at least 16 characters\"}")))
     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(example = "{\"error\": \"Failed to rotate game key\", \"message\": \"Database connection failed\"}")))
     public ResponseEntity<Map<String, String>> rotateGameKey(@RequestBody RotateKeyRequest request) {
-        String newGameKey = request.newGameKey();
+        String newGameKey = request.getNewGameKey();
 
         if (newGameKey == null || newGameKey.length() < 16) {
             return ResponseEntity.badRequest().body(Map.of(
@@ -95,16 +95,16 @@ public class AdminSettingsController {
     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(example = "{\"error\": \"Failed to configure webhook\", \"message\": \"Database connection failed\"}")))
     public ResponseEntity<Map<String, String>> configureWebhook(@RequestBody WebhookConfigRequest request) {
         try {
-            if (request.webhookUrl() != null && !request.webhookUrl().isBlank()) {
-                systemSettingService.setSetting("WEBHOOK_URL", request.webhookUrl());
+            if (request.getWebhookUrl() != null && !request.getWebhookUrl().isBlank()) {
+                systemSettingService.setSetting("WEBHOOK_URL", request.getWebhookUrl());
             }
 
-            if (request.topN() != null && request.topN() > 0) {
-                systemSettingService.setSetting("WEBHOOK_TOP_N", request.topN().toString());
+            if (request.getTopN() != null && request.getTopN() > 0) {
+                systemSettingService.setSetting("WEBHOOK_TOP_N", request.getTopN().toString());
             }
 
-            if (request.cooldownMs() != null && request.cooldownMs() > 0) {
-                systemSettingService.setSetting("WEBHOOK_COOLDOWN_MS", request.cooldownMs().toString());
+            if (request.getCooldownMs() != null && request.getCooldownMs() > 0) {
+                systemSettingService.setSetting("WEBHOOK_COOLDOWN_MS", request.getCooldownMs().toString());
             }
 
             return ResponseEntity.ok(Map.of("message", "Webhook configured successfully"));
@@ -124,14 +124,14 @@ public class AdminSettingsController {
     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(schema = @Schema(example = "{\"error\": \"Failed to configure backup\", \"message\": \"Database connection failed\"}")))
     public ResponseEntity<Map<String, String>> configureBackup(@RequestBody BackupConfigRequest request) {
         try {
-            if (request.retentionDays() != null && request.retentionDays() > 0) {
-                systemSettingService.setSetting("BACKUP_RETENTION_DAYS", request.retentionDays().toString());
+            if (request.getRetentionDays() != null && request.getRetentionDays() > 0) {
+                systemSettingService.setSetting("BACKUP_RETENTION_DAYS", request.getRetentionDays().toString());
             }
-            
-            if (request.backupPath() != null && !request.backupPath().isBlank()) {
-                systemSettingService.setSetting("BACKUP_PATH", request.backupPath());
+
+            if (request.getBackupPath() != null && !request.getBackupPath().isBlank()) {
+                systemSettingService.setSetting("BACKUP_PATH", request.getBackupPath());
             }
-            
+
             return ResponseEntity.ok(Map.of("message", "Backup configured successfully"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

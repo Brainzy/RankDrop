@@ -16,9 +16,12 @@ import java.util.Optional;
 
 @Repository
 public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
-    void deleteByLeaderboard(Leaderboard leaderboard);
+    @Modifying
+    @Query("DELETE FROM ScoreEntry s WHERE s.leaderboard = :leaderboard")
+    void deleteByLeaderboard(@Param("leaderboard") Leaderboard leaderboard);
 
-    Page<ScoreEntry> findByLeaderboard_Slug(String slug, Pageable pageable);
+    @Query("SELECT s FROM ScoreEntry s WHERE s.leaderboard.slug = :slug")
+    Page<ScoreEntry> findByLeaderboardSlug(@Param("slug") String slug, Pageable pageable);
 
     @Modifying
     @Query(value = "UPDATE score_entries SET score_value = score_value + :value, submitted_at = :now WHERE leaderboard_id = :leaderboardId AND player_alias = :playerAlias", nativeQuery = true)
@@ -32,7 +35,10 @@ public interface ScoreEntryRepository extends JpaRepository<ScoreEntry, Long> {
     @Query(value = "UPDATE score_entries SET score_value = :value, submitted_at = :now WHERE leaderboard_id = :leaderboardId AND player_alias = :playerAlias AND score_value > :value", nativeQuery = true)
     int updateIfLowerScore(@Param("leaderboardId") Long leaderboardId, @Param("playerAlias") String playerAlias, @Param("value") double value, @Param("now") LocalDateTime now);
 
-    Optional<ScoreEntry> findByLeaderboardIdAndPlayerAlias(Long leaderboardId, String playerAlias);
+    @Query("SELECT s FROM ScoreEntry s WHERE s.leaderboard.id = :leaderboardId AND s.playerAlias = :playerAlias")
+    Optional<ScoreEntry> findByLeaderboardIdAndPlayerAlias(
+            @Param("leaderboardId") Long leaderboardId,
+            @Param("playerAlias") String playerAlias);
 
     @Query(value = "SELECT COUNT(*) FROM score_entries WHERE leaderboard_id = :leaderboardId AND (score_value > :score OR (score_value = :score AND submitted_at < :submittedAt))", nativeQuery = true)
     long countBetterScoresDesc(@Param("leaderboardId") Long leaderboardId, @Param("score") double score, @Param("submittedAt") LocalDateTime submittedAt);

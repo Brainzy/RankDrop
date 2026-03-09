@@ -44,7 +44,7 @@ public class ScoreCacheService {
 
             Pageable pageable = PageRequest.of(0, 100, sort);
             List<ScoreEntry> entries = scoreRepository
-                    .findByLeaderboard_Slug(slug, pageable).getContent();
+                    .findByLeaderboardSlug(slug, pageable).getContent();
 
             List<ScoreEntryResponse> response = new ArrayList<>();
             for (int i = 0; i < entries.size(); i++) {

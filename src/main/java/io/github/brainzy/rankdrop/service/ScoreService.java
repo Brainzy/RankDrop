@@ -11,6 +11,7 @@ import io.github.brainzy.rankdrop.exception.PlayerNotFoundException;
 import io.github.brainzy.rankdrop.repository.LeaderboardRepository;
 import io.github.brainzy.rankdrop.repository.ScoreEntryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScoreService {
@@ -131,8 +133,6 @@ public class ScoreService {
         Leaderboard leaderboard = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
-        Sort.Direction bestSort = resolveSortDirection(leaderboard.getSortOrder());
-
         ScoreEntry bestEntry = scoreRepository.findByLeaderboardIdAndPlayerAlias(leaderboard.getId(), playerAlias)
                 .orElseThrow(() -> new PlayerNotFoundException(playerAlias));
 
@@ -194,7 +194,7 @@ public class ScoreService {
         int safSize = Math.min(size, 1000);
         Pageable pageable = PageRequest.of(page, safSize, sort);
 
-        Page<ScoreEntry> scorePage = scoreRepository.findByLeaderboard_Slug(slug, pageable);
+        Page<ScoreEntry> scorePage = scoreRepository.findByLeaderboardSlug(slug, pageable);
 
         long pageOffset = (long) page * safSize;
         List<ScoreEntryResponse> result = new ArrayList<>();

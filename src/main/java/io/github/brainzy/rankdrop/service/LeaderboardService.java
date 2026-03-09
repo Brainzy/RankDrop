@@ -40,19 +40,19 @@ public class LeaderboardService {
     }
 
     public Leaderboard createNewLeaderboard(LeaderboardCreateRequest request) {
-        if (leaderboardRepository.findBySlug(request.slug()).isPresent()) {
-            throw new LeaderboardAlreadyExistsException(request.slug());
+        if (leaderboardRepository.findBySlug(request.getSlug()).isPresent()) {
+            throw new LeaderboardAlreadyExistsException(request.getSlug());
         }
 
         Leaderboard lb = Leaderboard.builder()
-                .slug(request.slug())
-                .displayName(request.displayName())
-                .sortOrder(request.sortOrder())
-                .scoreStrategy(request.scoreStrategy())
-                .minScore(request.minScore())
-                .maxScore(request.maxScore())
-                .resetFrequency(request.resetFrequency())
-                .archiveOnReset(request.archiveOnReset())
+                .slug(request.getSlug())
+                .displayName(request.getDisplayName())
+                .sortOrder(request.getSortOrder())
+                .scoreStrategy(request.getScoreStrategy())
+                .minScore(request.getMinScore())
+                .maxScore(request.getMaxScore())
+                .resetFrequency(request.getResetFrequency())
+                .archiveOnReset(request.getArchiveOnReset())
                 .build();
 
         calculateNextReset(lb);
@@ -83,7 +83,7 @@ public class LeaderboardService {
         Leaderboard board = leaderboardRepository.findBySlug(slug)
                 .orElseThrow(() -> new LeaderboardNotFoundException(slug));
 
-        performReset(board, request.archiveScores(), request.resetLabel());
+        performReset(board, request.isArchiveScores(), request.getResetLabel());
     }
 
     @Transactional
@@ -95,7 +95,7 @@ public class LeaderboardService {
             archiveScores(board, resetLabel);
         }
 
-        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(board.getSlug(), Pageable.unpaged()).getContent();
+        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboardSlug(board.getSlug(), Pageable.unpaged()).getContent();
         if (!entries.isEmpty()) {
             scoreEntryRepository.deleteAllInBatch(entries);
         }
@@ -121,7 +121,7 @@ public class LeaderboardService {
 
     private void archiveScores(Leaderboard board, String resetLabel) {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
-        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboard_Slug(board.getSlug(), Pageable.unpaged()).getContent();
+        List<ScoreEntry> entries = scoreEntryRepository.findByLeaderboardSlug(board.getSlug(), Pageable.unpaged()).getContent();
 
         List<ScoreArchive> archives = entries.stream()
                 .map(entry -> mapToArchive(entry, resetLabel, now))

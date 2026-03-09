@@ -94,10 +94,8 @@ Current status of all features. ✅ = Implemented
 
 ### Client SDKs
 
-- [ ] Unity C# SDK
+- [✅] Unity C# SDK, proprietary on Unity asset store as a 60 sec deployment
 - [ ] Godot GDScript SDK ⏳
-- [ ] Error handling and retry logic in SDKs
-- [ ] Async/await support in SDKs
 
 ---
 

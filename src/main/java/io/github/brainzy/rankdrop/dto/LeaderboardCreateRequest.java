@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.Data;
 
+@Data
 @Schema(description = "Request object for creating a new leaderboard", example = """
         {
           "slug": "global-speedrun-v1",
@@ -20,73 +22,85 @@ import jakarta.validation.constraints.Size;
           "archiveOnReset": false
         }
         """)
-public record LeaderboardCreateRequest(
-        @Schema(
-                description = "Unique identifier for the leaderboard. Used in API URLs.",
-                example = "global-speedrun-v1",
-                requiredMode = Schema.RequiredMode.REQUIRED
-        )
-        @NotBlank(message = "Slug is required")
-        @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must be lowercase alphanumeric with hyphens")
-        String slug,
+public class LeaderboardCreateRequest {
+    @Schema(
+            description = "Unique identifier for the leaderboard. Used in API URLs.",
+            example = "global-speedrun-v1",
+            requiredMode = Schema.RequiredMode.REQUIRED
+    )
+    @NotBlank(message = "Slug is required")
+    @Pattern(regexp = "^[a-z0-9-]+$", message = "Slug must be lowercase alphanumeric with hyphens")
+    private String slug;
 
-        @Schema(
-                description = "The name displayed to players in-game.",
-                example = "Global High Scores",
-                requiredMode = Schema.RequiredMode.REQUIRED,
-                minLength = 1,
-                maxLength = 50
-        )
-        @NotBlank(message = "Display name is required")
-        @Size(min = 1, max = 50, message = "Display name must be between 1 and 50 characters")
-        String displayName,
+    @Schema(
+            description = "The name displayed to players in-game.",
+            example = "Global High Scores",
+            requiredMode = Schema.RequiredMode.REQUIRED,
+            minLength = 1,
+            maxLength = 50
+    )
+    @NotBlank(message = "Display name is required")
+    @Size(min = 1, max = 50, message = "Display name must be between 1 and 50 characters")
+    private String displayName;
 
-        @Schema(
-                description = "Determines the ranking logic. DESC (default) for points where higher is better. ASC for time/speedruns where lower is better.",
-                example = "DESC",
-                defaultValue = "DESC",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED,
-                allowableValues = {"ASC", "DESC"}
-        )
-        SortOrder sortOrder,
+    @Schema(
+            description = "Determines the ranking logic. DESC (default) for points where higher is better. ASC for time/speedruns where lower is better.",
+            example = "DESC",
+            defaultValue = "DESC",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            allowableValues = {"ASC", "DESC"}
+    )
+    private SortOrder sortOrder;
 
-        @Schema(
-                description = "Strategy for handling score submissions. BEST_ONLY (default) keeps only the best score per player. MULTIPLE_ENTRIES stores every submission. CUMULATIVE sums all submissions of same player.",
-                example = "BEST_ONLY",
-                defaultValue = "BEST_ONLY",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED,
-                allowableValues = {"BEST_ONLY", "MULTIPLE_ENTRIES", "CUMULATIVE"}
-        )
-        ScoreStrategy scoreStrategy,
+    @Schema(
+            description = "Strategy for handling score submissions. BEST_ONLY (default) keeps only the best score per player. MULTIPLE_ENTRIES stores every submission. CUMULATIVE sums all submissions of same player.",
+            example = "BEST_ONLY",
+            defaultValue = "BEST_ONLY",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+            allowableValues = {"BEST_ONLY", "MULTIPLE_ENTRIES", "CUMULATIVE"}
+    )
+    private ScoreStrategy scoreStrategy;
 
-        @Schema(description = "Optional minimum score value allowed for submission", example = "0", defaultValue = "0")
-        Double minScore,
+    @Schema(description = "Optional minimum score value allowed for submission", example = "0", defaultValue = "0")
+    private Double minScore;
 
-        @Schema(description = "Optional maximum score value allowed for submission", example = "1000000", defaultValue = "1000000")
-        Double maxScore,
+    @Schema(description = "Optional maximum score value allowed for submission", example = "1000000", defaultValue = "1000000")
+    private Double maxScore;
 
-        @Schema(
-                description = "Frequency of automatic resets. NONE (default), DAILY, WEEKLY, MONTHLY.",
-                example = "NONE",
-                defaultValue = "NONE",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED
-        )
-        ResetFrequency resetFrequency,
+    @Schema(
+            description = "Frequency of automatic resets. NONE (default), DAILY, WEEKLY, MONTHLY.",
+            example = "NONE",
+            defaultValue = "NONE",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
+    private ResetFrequency resetFrequency;
 
-        @Schema(
-                description = "If true, scores are archived before automatic reset. Default is false.",
-                example = "false",
-                defaultValue = "false",
-                requiredMode = Schema.RequiredMode.NOT_REQUIRED
-        )
-        Boolean archiveOnReset
-) {
-    public LeaderboardCreateRequest {
-        sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
-        scoreStrategy = (scoreStrategy == null) ? ScoreStrategy.BEST_ONLY : scoreStrategy;
-        minScore = (minScore == null) ? 0.0 : minScore;
-        maxScore = (maxScore == null) ? 1000000.0 : maxScore;
-        resetFrequency = (resetFrequency == null) ? ResetFrequency.NONE : resetFrequency;
-        archiveOnReset = (archiveOnReset != null) && archiveOnReset;
+    @Schema(
+            description = "If true, scores are archived before automatic reset. Default is false.",
+            example = "false",
+            defaultValue = "false",
+            requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
+    private Boolean archiveOnReset;
+
+    public LeaderboardCreateRequest() {
+        sortOrder = SortOrder.DESC;
+        scoreStrategy = ScoreStrategy.BEST_ONLY;
+        minScore = 0.0;
+        maxScore = 1000000.0;
+        resetFrequency = ResetFrequency.NONE;
+        archiveOnReset = false;
+    }
+
+    public LeaderboardCreateRequest(String slug, String displayName, SortOrder sortOrder, ScoreStrategy scoreStrategy,
+                                    Double minScore, Double maxScore, ResetFrequency resetFrequency, Boolean archiveOnReset) {
+        this.slug = slug;
+        this.displayName = displayName;
+        this.sortOrder = (sortOrder == null) ? SortOrder.DESC : sortOrder;
+        this.scoreStrategy = (scoreStrategy == null) ? ScoreStrategy.BEST_ONLY : scoreStrategy;
+        this.minScore = (minScore == null) ? 0.0 : minScore;
+        this.maxScore = (maxScore == null) ? 1000000.0 : maxScore;
+        this.resetFrequency = (resetFrequency == null) ? ResetFrequency.NONE : resetFrequency;
+        this.archiveOnReset = (archiveOnReset != null) && archiveOnReset;
     }
 }

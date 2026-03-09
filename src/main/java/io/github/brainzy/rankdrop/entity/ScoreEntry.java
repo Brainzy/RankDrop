@@ -34,7 +34,7 @@ public class ScoreEntry {
     private Long id;
 
     @JsonBackReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "leaderboard_id", nullable = false)
     @Schema(description = "The leaderboard this score belongs to")
     private Leaderboard leaderboard;

@@ -2,29 +2,35 @@ package io.github.brainzy.rankdrop.dto;
 
 import io.github.brainzy.rankdrop.entity.ScoreEntry;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Response object representing a score entry with rank")
-public record ScoreEntryResponse(
-        @Schema(description = "Internal ID of the score entry", example = "101")
-        Long id,
+public class ScoreEntryResponse {
+    @Schema(description = "Internal ID of the score entry", example = "101")
+    private Long id;
 
-        @Schema(description = "The player's display name", example = "PlayerOne")
-        String playerAlias,
+    @Schema(description = "The player's display name", example = "PlayerOne")
+    private String playerAlias;
 
-        @Schema(description = "The score value", example = "1500.5")
-        double scoreValue,
+    @Schema(description = "The score value", example = "1500.5")
+    private double scoreValue;
 
-        @Schema(description = "The rank of the player in the leaderboard", example = "1")
-        long rank,
+    @Schema(description = "The rank of the player in the leaderboard", example = "1")
+    private long rank;
 
-        @Schema(description = "Timestamp when the score was submitted", example = "2023-10-01T12:00:00")
-        LocalDateTime submittedAt,
+    @Schema(description = "Timestamp when the score was submitted", example = "2023-10-01T12:00:00")
+    private LocalDateTime submittedAt;
 
-        @Schema(description = "Optional metadata associated with the score", example = "Level 5 - Warrior")
-        String metadata
-) {
+    @Schema(description = "Optional metadata associated with the score", example = "Level 5 - Warrior")
+    private String metadata;
+
     public static ScoreEntryResponse fromEntity(ScoreEntry entry, long rank) {
         return new ScoreEntryResponse(
                 entry.getId(),
