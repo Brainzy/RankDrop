@@ -18,7 +18,7 @@ Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
 The manual path is free and fully documented below. If you'd rather skip the hour, the **RankDrop Unity Asset** handles
 both deploy and Unity integration in 60 seconds.
 
-- 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)** — coming soon
+- 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)**
 - ☁️ **[TurnKit.dev](https://turnkit.dev)**
 
 RankDrop is also the leaderboard foundation of **[TurnKit](https://turnkit.dev)** — a multiplayer backend for
