@@ -148,9 +148,7 @@ Current status of all features. ✅ = Implemented
 
 ### Hosting Options
 
-- [ ] Google Cloud Free Tier deployment guide
-- [ ] Koyeb + Aiven deployment guide
-- [ ] Oracle Cloud Free Tier deployment guide
+- [✅] Koyeb + Aiven deployment guide
 
 ### Operations
 
