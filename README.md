@@ -7,44 +7,6 @@ Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
 
 ---
 
-## ⚡ 60-Second Deploy for Unity and Godot
-
-| Path                                 | Deploy   | Unity integration | Total      |
-|--------------------------------------|----------|-------------------|------------|
-| Manual self-host                     | ~10 min  | 30–60 min         | ~1 hour    |
-| RankDrop Unity Asset                 | included | included          | 60 seconds |
-| Godot RankDrop deploy                | included | included          | 60 seconds |
-| TurnKit hosted leaderboards          | included | included          | instant    |
-
-The manual path is free and fully documented below. If you'd rather skip the hour, use the links bellow to deploy in 60 seconds to Unity or Godot. 
-You can also use TurnKit hosted leaderboards with free up to 20CCU.
-
-- 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)**
-- 🕹️ **[Godot deploy asset](https://brainzy.itch.io/godot-rankdrop-leaderboards-in-60-seconds-no-monthly-costs-and-own-your-data)**
-- ☁️ **[TurnKit.dev](https://turnkit.dev)**
-
-If you are using the SDK manually after deployment:
-
-- **Unity SDK:** [RankDrop Unity SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/unity-sdk-1.0.0)
-- **Godot SDK:** [RankDrop Godot SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/godot-sdk-1.0.0)
-
-RankDrop is also the leaderboard foundation of **[TurnKit](https://turnkit.dev)** — a multiplayer backend for
-turn-based games including authorative relay with matchmaking.
-
----
-
-## Who Is This For?
-
-RankDrop is for developers who want a leaderboard backend without paying monthly fees or trusting third parties with
-their data. If your game or app needs score tracking, rankings, or competitive features — RankDrop runs on
-infrastructure you control.
-
-- **Self-host for free** — runs on Koyeb, Oracle Cloud, or any VPS
-- **Full control** — your database, your data, your rules
-- **No lock-in** — open source, Apache 2.0
-
----
-
 ## Features
 
 - **Multiple leaderboard types** — all-time, daily, weekly, monthly with automatic resets
@@ -57,8 +19,6 @@ infrastructure you control.
 - **Tiny footprint** — GraalVM native image, ~118MB Docker image, ~50ms startup
 
 ---
-
-![RankDrop API](assets/swagger-preview.png)
 
 ## Quick Start
 
@@ -104,9 +64,16 @@ docker run -d \
   rankdrop-app:v1
 ```
 
+Use the SDK for Unity or Godot in your project
+
+- **Unity SDK:** [RankDrop Unity SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/unity-sdk-1.0.0)
+- **Godot SDK:** [RankDrop Godot SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/godot-sdk-1.0.0)
+
 ---
 
 ## API Overview
+
+![RankDrop API](assets/swagger-preview.png)
 
 ### Client API
 
@@ -143,6 +110,27 @@ Full interactive documentation at `/swagger-ui/index.html`.
 | Migrations | Flyway                               |
 | Docs       | OpenAPI 3 / Swagger UI               |
 | Deployment | Docker, Docker Compose               |
+
+---
+
+## Deployment options
+
+| Path                                 | Deploy   |  Total      |
+|--------------------------------------|----------|	------------|
+| Manual self-host                     | ~60 min  | ~1 hour 	|
+| RankDrop Unity Asset                 | included |  60 seconds |
+| Godot RankDrop deploy                | included | 60 seconds  |
+| TurnKit hosted leaderboards          | included | instant     |
+
+The manual path is free and fully documented below. If you'd rather skip the hour, use the links bellow to deploy in 60 seconds to Unity or Godot. 
+You can also use TurnKit hosted leaderboards with free up to 20CCU.
+
+- 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)**
+- 🕹️ **[Godot deploy asset](https://brainzy.itch.io/godot-rankdrop-leaderboards-in-60-seconds-no-monthly-costs-and-own-your-data)**
+- ☁️ **[TurnKit.dev](https://turnkit.dev)**
+
+RankDrop is also the leaderboard foundation of **[TurnKit](https://turnkit.dev)** — a multiplayer backend for
+turn-based games including authorative relay with matchmaking.
 
 ---
 
