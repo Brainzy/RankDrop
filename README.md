@@ -3,7 +3,7 @@
 **Self-hosted leaderboard backend for games and apps. Own your data, zero recurring cost.**
 
 Deploy on your own infrastructure in minutes. No pricing per user, no vendor lock-in, no surprises.
-Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
+Works with Unity (SDK included), Godot(SDK included), or any HTTP client.
 
 ---
 
