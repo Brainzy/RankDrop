@@ -7,19 +7,26 @@ Works with any HTTP client — Unity, Godot, mobile, web, or desktop.
 
 ---
 
-## ⚡ 60-Second Deploy for Unity
+## ⚡ 60-Second Deploy for Unity and Godot
 
 | Path                                 | Deploy   | Unity integration | Total      |
 |--------------------------------------|----------|-------------------|------------|
 | Manual self-host                     | ~10 min  | 30–60 min         | ~1 hour    |
 | RankDrop Unity Asset                 | included | included          | 60 seconds |
+| Godot RankDrop deploy                | included | included          | 60 seconds |
 | TurnKit hosted leaderboards          | included | included          | instant    |
 
-The manual path is free and fully documented below. If you'd rather skip the hour, the **RankDrop Unity Asset** handles
-both deploy and Unity integration in 60 seconds or use TurnKit hosted leaderboards with free up to 20CCU.
+The manual path is free and fully documented below. If you'd rather skip the hour, use the links bellow to deploy in 60 seconds to Unity or Godot. 
+You can also use TurnKit hosted leaderboards with free up to 20CCU.
 
 - 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)**
+- 🕹️ **[Godot deploy asset](https://brainzy.itch.io/godot-rankdrop-leaderboards-in-60-seconds-no-monthly-costs-and-own-your-data)**
 - ☁️ **[TurnKit.dev](https://turnkit.dev)**
+
+If you are using the SDK manually after deployment:
+
+- **Unity SDK:** [RankDrop Unity SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/unity-sdk-1.0.0)
+- **Godot SDK:** [RankDrop Godot SDK v1.0.0](https://github.com/Brainzy/RankDrop/releases/tag/godot-sdk-1.0.0)
 
 RankDrop is also the leaderboard foundation of **[TurnKit](https://turnkit.dev)** — a multiplayer backend for
 turn-based games including authorative relay with matchmaking.
@@ -167,13 +174,11 @@ HTTPS — not needed on Koyeb which handles it automatically.
 
 Apache 2.0 — see [LICENSE](LICENSE) for details.
 
-The Unity Asset deployment tooling is proprietary and not covered by this license.
-
 ---
 
 ## Part of TurnKit
 
-RankDrop is the leaderboard module powering **[TurnKit.dev](https://turnkit.dev)** — a no-code backend for turn-based
-multiplayer games. Relay, matchmaking, player economy, and leaderboards. No backend code required.
+RankDrop is the leaderboard module powering **[TurnKit.dev](https://turnkit.dev)** — backend for turn-based
+multiplayer games. Relay, matchmaking, and leaderboards, all free up to 20CCU.
 
-[Follow the build at TurnKit.dev →](https://turnkit.dev)
+[Sign up at TurnKit.dev →](https://turnkit.dev)
