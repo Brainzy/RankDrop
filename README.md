@@ -122,7 +122,7 @@ Full interactive documentation at `/swagger-ui/index.html`.
 | Godot RankDrop deploy                | included | 60 seconds  |
 | TurnKit hosted leaderboards          | included | instant     |
 
-The manual path is free and fully documented below. If you'd rather skip the hour, use the links bellow to deploy in 60 seconds to Unity or Godot. 
+The manual path is free and fully documented below. If you'd rather skip the hour, use the links bellow to deploy in 60 seconds to Unity or Godot with Editor scripts instead of Swagger UI. 
 You can also use TurnKit hosted leaderboards with free up to 20CCU.
 
 - 🎮 **[Unity Asset Store](https://assetstore.unity.com/packages/tools/integration/rankdrop-leaderboards-in-60-seconds-366688)**
